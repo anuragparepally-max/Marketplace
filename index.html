@@ -579,7 +579,7 @@
                 <div class="grid">
                   <div class="panel card">
                     <div class="cardHeader">
-                      <div class="cardTitle">Performance Trend</div>
+                      <div class="cardTitle">Chauffeur Average Score</div>
                       <div class="subtle" id="trendScope">Scope: —</div>
                     </div>
                     <div class="chartWrap">
@@ -617,7 +617,7 @@
                     <div class="chartWrap">
                       <canvas id="cityChart"></canvas>
                     </div>
-                    <div class="hint">Each city has two bars: Avg Score (0–100) and Revenue ($). Click a city to drill-in.</div>
+                    <div class="hint">Each city has two bars: Chauffeur Score (0–100) and Revenue ($). Click a city to drill-in.</div>
                   </div>
                 </div>
               </div>
@@ -671,7 +671,7 @@
           <canvas id="cityTrendChart" style="width:100% !important; height:240px !important;"></canvas>
         </div>
         <div style="border:1px solid #e6edf6; border-radius:14px; padding:12px; background:#fff;">
-          <div style="font-weight:900; color:#0b3351; margin-bottom:8px;">City Score Distribution</div>
+          <div style="font-weight:900; color:#0b3351; margin-bottom:8px;">Chauffeur Score Distribution</div>
           <canvas id="cityDistChart" style="width:100% !important; height:240px !important;"></canvas>
         </div>
         <div style="border:1px solid #e6edf6; border-radius:14px; padding:12px; background:#fff;">
@@ -795,6 +795,36 @@
   </div>
 
   <script>
+    /********************************************************
+     * Custom Plugins
+     ********************************************************/
+    // Define outside to avoid scope issues
+    const dataLabelsPlugin = {
+      id: 'dataLabelsPlugin',
+      afterDatasetsDraw(chart, args, options) {
+        const { ctx, data } = chart;
+        ctx.save();
+        ctx.font = '700 11px Inter, sans-serif'; 
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+
+        chart.data.datasets.forEach((dataset, i) => {
+          const meta = chart.getDatasetMeta(i);
+          meta.data.forEach((bar, index) => {
+            const value = dataset.data[index];
+            if(value > 0){
+              // Smart text color: if bar is light (index 3), use dark text
+              // Index 0,1,2 are dark/medium blue or grey => white text
+              const isLightBar = (i === 0 && index === 3); 
+              ctx.fillStyle = (index === 3) ? '#0f172a' : '#ffffff';
+              ctx.fillText(value, bar.x, bar.y + (bar.height) - 5);
+            }
+          });
+        });
+        ctx.restore();
+      }
+    };
+
     /********************************************************
      * Utilities
      ********************************************************/
@@ -1377,8 +1407,8 @@
         data: {
           labels: months,
           datasets: [
-            { label: "Avg Score", data: avgScore, tension:0.35, borderWidth:2, pointRadius:3, yAxisID:"y" },
-            { label: "Chauffeurs", data: chTrend, tension:0.35, borderWidth:2, pointRadius:3, yAxisID:"y2" }
+            { label: "Chauffeur Score", data: avgScore, tension:0.35, borderWidth:2, pointRadius:3, yAxisID:"y" }
+            // Removed secondary Chauffeurs trend line entirely
           ]
         },
         options: {
@@ -1390,7 +1420,6 @@
           },
           scales: {
             y:  { min:0, max:100, grid:{ color:"rgba(15,23,42,0.06)" } },
-            y2: { position:"right", min:0, max:200, grid:{ drawOnChartArea:false }, ticks:{ stepSize:50 } },
             x:  { grid:{ display:false } }
           }
         }
@@ -1415,31 +1444,6 @@
     function makeBarChart(ctx, labels, values, title, opts = {}){
       const colors = opts.colors || null;
 
-      // Custom plugin to draw numbers on bars (for the screenshot look)
-      const dataLabelsPlugin = {
-        id: 'dataLabelsPlugin',
-        afterDatasetsDraw(chart, args, options) {
-          const { ctx, data } = chart;
-          ctx.save();
-          ctx.font = '700 11px Inter, sans-serif'; // Reduced size slightly
-          ctx.fillStyle = '#ffffff'; 
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'bottom';
-
-          chart.data.datasets.forEach((dataset, i) => {
-            const meta = chart.getDatasetMeta(i);
-            meta.data.forEach((bar, index) => {
-              const value = dataset.data[index];
-              if(value > 0){
-                // Draw inside bottom
-                ctx.fillText(value, bar.x, bar.y + (bar.height) - 5);
-              }
-            });
-          });
-          ctx.restore();
-        }
-      };
-
       return new Chart(ctx, {
         type:"bar",
         data:{
@@ -1451,7 +1455,7 @@
             borderRadius:6,
             backgroundColor: colors || undefined,
             borderColor: colors || undefined,
-            barPercentage: 0.7, // Thinner bars to match screenshot
+            barPercentage: 0.7, 
             categoryPercentage: 0.8
           }]
         },
@@ -1461,7 +1465,7 @@
           maintainAspectRatio:false,
           plugins:{ 
             legend:{ display: !!opts.showLegend },
-            tooltip: { enabled: false } // Disable tooltip since we show numbers
+            tooltip: { enabled: false } 
           },
           onClick: opts.onClick || undefined,
           scales:{
@@ -1470,17 +1474,17 @@
               ticks: { 
                 font: { size: 10, weight: 'bold' },
                 color: '#64748b',
-                // Allow multiline labels
                 callback: function(val, index) {
-                  return this.getLabelForValue(val).split(' ');
+                  const label = this.getLabelForValue(val);
+                  return label.split(' ');
                 }
               }
             },
             y:{ 
               beginAtZero:true, 
               max: opts.maxY ?? undefined, 
-              grid:{ color:"rgba(15,23,42,0.06)", borderDash:[4,4] }, // Dotted grid lines
-              border: { display: false } // Hide axis line
+              grid:{ color:"rgba(15,23,42,0.06)", borderDash:[4,4] }, 
+              border: { display: false } 
             }
           }
         }
@@ -1520,8 +1524,9 @@
     function makeCityCompareChart(ctx, cities){
       const scoreVals = getCityCompareScores(cities);
       const revValsK  = getCityCompareRevenues(cities); // $K
-      const scoreColors = barColors(cities);
-      const revColors = barColors(cities).map(c => c.replace("45%)", "35%)")); // slight variation
+      
+      const scoreColors = Array(cities.length).fill("#dc2626"); // Red
+      const revColors = Array(cities.length).fill("#16a34a");   // Green
 
       return new Chart(ctx, {
         type:"bar",
@@ -1529,7 +1534,7 @@
           labels: cities,
           datasets:[
             {
-              label:"Avg Score",
+              label:"Chauffeur Score",
               data: scoreVals,
               yAxisID:"y",
               borderRadius:10,
@@ -1555,7 +1560,7 @@
               callbacks:{
                 label:(ctx)=>{
                   if (ctx.dataset.label.includes("Revenue")) return `Revenue: ${formatMoney(ctx.raw*1000)}`;
-                  return `Avg Score: ${ctx.raw}`;
+                  return `Score: ${ctx.raw}`;
                 }
               }
             }
@@ -1567,7 +1572,7 @@
           },
           scales:{
             x:{ grid:{ display:false }, ticks:{ maxRotation:55, minRotation:55 } },
-            y:{ beginAtZero:true, max:100, grid:{ color:"rgba(15,23,42,0.06)" }, title:{ display:true, text:"Avg Score (0–100)" } },
+            y:{ beginAtZero:true, max:100, grid:{ color:"rgba(15,23,42,0.06)" }, title:{ display:true, text:"Score (0–100)" } },
             y2:{
               position:"right",
               beginAtZero:true,
@@ -1598,15 +1603,11 @@
       trendChart = makeTrendChart(document.getElementById("trendChart"), metrics.months, metrics.avgScore, metrics.chTrend);
       tierChart  = makePieChart(document.getElementById("tierChart"), metrics.tiers);
 
-      // --- Performance Score Distribution (Matches Screenshot) ---
-      // 1. Chart colors defined
-      const distColors = ["#174e86", "#2563eb", "#94a3b8", "#cbd5e1"]; // Dark, Mid, Grey, Light
-      
-      // 2. Chart labels (Axis)
+      // --- Performance Score Distribution ---
+      const distColors = ["#174e86", "#2563eb", "#94a3b8", "#cbd5e1"]; 
       const distLabels = ["4.5- 5.0", "4.0- 4.4", "3.5- 3.9", "3.0- 3.4"];
       const distValues = [metrics.bands.excellent, metrics.bands.good, metrics.bands.average, metrics.bands.needsImp];
 
-      // 3. Make Chart
       distChart = makeBarChart(
         document.getElementById("distChart"),
         distLabels,
@@ -1614,11 +1615,10 @@
         "Number of Chauffeurs",
         { 
           colors: distColors,
-          maxY: Math.max(...distValues) + 15 // Add headroom for labels
+          maxY: Math.max(...distValues) + 15 
         }
       );
 
-      // 4. Create Custom Legend Grid below chart
       const legendContainer = document.getElementById("distLegend");
       const legendItems = [
         { label: "Excellent", color: "#174e86", val: distValues[0] },
@@ -1636,8 +1636,6 @@
           <div class="sbVal">${item.val}</div>
         </div>
       `).join("");
-
-      // --- End Distribution Chart Logic ---
 
       cityChart = makeCityCompareChart(document.getElementById("cityChart"), getCityCompareScopeCities());
 
@@ -1661,7 +1659,6 @@
 
       modalTitle.textContent = `City Performance • ${city}`;
 
-      // Header KPIs in city modal
       document.getElementById("cityRevenue").textContent = formatMoney(cityRevenue(city));
       document.getElementById("cityAvgScore").textContent = m.score.replace("%","");
       document.getElementById("cityManagers").textContent = gms.length;
@@ -1672,14 +1669,21 @@
 
       cityTrendChart = makeTrendChart(document.getElementById("cityTrendChart"), m.months, m.avgScore, m.chTrend);
 
+      const distColors = ["#174e86", "#2563eb", "#94a3b8", "#cbd5e1"];
+      const distLabels = ["4.5- 5.0", "4.0- 4.4", "3.5- 3.9", "3.0- 3.4"];
+      const distValues = [m.bands.excellent, m.bands.good, m.bands.average, m.bands.needsImp];
+
       cityDistChart  = makeBarChart(
         document.getElementById("cityDistChart"),
-        ["4.5-5.0","4.0-4.4","3.5-3.9","< 3.5"],
-        [m.bands.excellent, m.bands.good, m.bands.average, m.bands.needsImp],
-        "Number of Chauffeurs"
+        distLabels,
+        distValues,
+        "Number of Chauffeurs",
+        { 
+          colors: distColors,
+          maxY: Math.max(...distValues) + 15
+        }
       );
 
-      // GM chart: show GM revenue (primary) + allow click to open GM modal
       const colors = barColors(gms);
       gmChart = makeBarChart(
         document.getElementById("gmChart"),
@@ -1702,6 +1706,9 @@
     }
 
     // ---- GM Modal open ----
+    // Remove duplicate var declaration
+    // let gmRevenueTrendChart; is already declared globally
+
     function openGmModal(city, gmName){
       const profile = gmProfile(city, gmName);
 
@@ -1711,14 +1718,12 @@
       document.getElementById("gmReviewScore").textContent = profile.reviewScore;
       document.getElementById("gmReviewSnippet").textContent = profile.reviewSnippet;
 
-      // Chauffeur list
       const listEl = document.getElementById("gmChauffeurList");
       const countEl = document.getElementById("gmChauffeurCount");
       const chauffeurs = profile.chauffeurs;
 
       countEl.textContent = `${chauffeurs.length} chauffeurs`;
 
-      // remove old rows (keep header)
       listEl.querySelectorAll(".chauffRow").forEach(n => n.remove());
 
       chauffeurs.forEach((ch, idx) => {
@@ -1738,7 +1743,6 @@
           </div>
         `;
 
-        // PASS THE SCORE TO THE MODAL
         row.addEventListener("click", ()=>{
           openChauffeurModal(city, gmName, ch.name, ch.score);
         });
@@ -1746,17 +1750,20 @@
         listEl.appendChild(row);
       });
 
-      // GM Revenue trend chart (Fixed logic: Real Revenue vs Score)
-      destroyIf(gmRevenueTrendChart);
-      gmRevenueTrendChart = makeGmRevenueTrendChart(
-        document.getElementById("gmRevenueTrendChart"), 
-        city, 
-        gmName, 
-        profile.revenue, 
-        profile.reviewScore
-      );
-
       gmModalOverlay.style.display = "flex";
+      
+      requestAnimationFrame(() => {
+        if(gmRevenueTrendChart) {
+          gmRevenueTrendChart.destroy();
+        }
+        gmRevenueTrendChart = makeGmRevenueTrendChart(
+          document.getElementById("gmRevenueTrendChart"), 
+          city, 
+          gmName, 
+          profile.revenue, 
+          profile.reviewScore
+        );
+      });
     }
 
     function makeGmRevenueTrendChart(ctx, city, gmName, currentRev, currentScore){
