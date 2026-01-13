@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Talent Marketplace • Company Wide Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#eef3f9;
+      --surface:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#e6edf6;
+      --nav:#0a3f66;
+      --nav2:#083552;
+      --slideTop:#ffffff;
+      --slideBottom1:#0b2a46;
+      --slideBottom2:#081c2f;
+      --good:#16a34a;
+      --bad:#dc2626;
+      --pill:#e8f2fb;
+      --pillBorder:rgba(11,79,123,0.12);
+      --pillText:#0b4f7b;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .slide{ min-height:100vh; display:flex; flex-direction:column; }
+    .slideHeader{
+      height:78px;
+      background:var(--slideTop);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 44px;
+      border-bottom:4px solid rgba(15,23,42,0.65);
+    }
+    .slideTitle{
+      font-size:30px;
+      font-weight:900;
+      letter-spacing:0.5px;
+      color:#111827;
+      text-transform:uppercase;
+    }
+    .careyWordmark svg{ height:34px; width:auto; display:block; }
+
+    .slideMain{
+      flex:1;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding:30px 24px 80px;
+      background:var(--bg);
+    }
+    .frame{ width:min(1080px, 96vw); }
+
+    .slideFooter{
+      height:70px;
+      background:linear-gradient(90deg, var(--slideBottom2), var(--slideBottom1), var(--slideBottom2));
+    }
+
+    .app{
+      display:flex;
+      min-height: calc(100vh - 78px - 70px - 110px);
+      overflow:hidden;
+      box-shadow:0 18px 60px rgba(0,0,0,0.18);
+      border:1px solid rgba(15,23,42,0.10);
+      background:#fff;
+    }
+
+    .sidebar{
+      width:250px;
+      background:linear-gradient(180deg, var(--nav), var(--nav2));
+      color:#e6f2ff;
+      padding:16px 12px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      padding:10px 10px 16px 10px;
+      border-bottom:1px solid rgba(255,255,255,0.08);
+      margin-bottom:12px;
+    }
+    .brand svg{
+      width:180px;
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 2px 10px rgba(0,0,0,0.20));
+    }
+
+    .nav{ display:flex; flex-direction:column; gap:6px; padding:8px 6px; }
+    .nav a{
+      text-decoration:none;
+      color:#d9eeff;
+      padding:10px 12px;
+      border-radius:12px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:700;
+      opacity:.92;
+      cursor:pointer;
+    }
+    .nav a:hover{ background:rgba(255,255,255,0.08) }
+    .nav a.active{
+      background:rgba(255,255,255,0.14);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+    .ico{ width:18px;height:18px; border-radius:5px; background:rgba(255,255,255,0.18); display:inline-block; }
+
+    .main{ flex:1; display:flex; flex-direction:column; background:#f6f9fc; }
+    .topbar{
+      height:58px;
+      background:#d7eaf7;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 18px;
+      border-bottom:1px solid rgba(15,23,42,0.06);
+    }
+    .topLeft{ display:flex; flex-direction:column; gap:2px; }
+    .topLeft .welcome{ font-weight:800; color:#0b3351; font-size:13px; }
+    .topLeft .role{ font-size:11px; font-weight:700; color:#2b5b7b; opacity:.9; }
+    .topRight{ display:flex; align-items:center; gap:10px; }
+    .iconBtn{
+      width:30px;height:30px;border-radius:10px;
+      border:1px solid rgba(15,23,42,0.08);
+      background:rgba(255,255,255,0.65);
+      display:grid;place-items:center;
+      cursor:pointer;
+      font-size:14px;
+    }
+    .avatar{
+      width:30px;height:30px;border-radius:999px;
+      background:linear-gradient(135deg, #1c7fb8, #0b4f7b);
+      border:2px solid rgba(255,255,255,0.8);
+    }
+
+    .content{
+      padding:14px 16px 18px;
+      overflow:auto;
+      height: calc(100vh - 58px - 78px - 70px - 110px);
+      min-height:520px;
+    }
+
+    .page{ display:none; }
+    .page.active{ display:block; animation:fadeIn 0.3s ease; }
+    @keyframes fadeIn{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+    .panel{
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:12px;
+      box-shadow:0 10px 22px rgba(15,23,42,0.07);
+    }
+
+    /* Reports & Analytics */
+    .backRow{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+    .backLink{ display:flex; align-items:center; gap:10px; color:#2b5b7b; font-weight:800; font-size:13px; user-select:none; }
+    .actions{display:flex; gap:8px;}
+    .btn{
+      border:1px solid rgba(15,23,42,0.12);
+      background:var(--surface);
+      padding:9px 11px;
+      border-radius:12px;
+      font-weight:800;
+      cursor:pointer;
+      font-size:12px;
+    }
+    .btn.primary{ background:#0b4f7b; color:#fff; border-color:transparent; }
+
+    .filters{padding:12px; margin-bottom:12px;}
+    .filtersGrid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .select{display:flex; flex-direction:column; gap:6px;}
+    .select label{font-size:11px; color:var(--muted); font-weight:800;}
+    select{
+      width:100%;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      font-weight:700;
+      color:#0f172a;
+      outline:none;
+      font-size:12px;
+    }
+    select:disabled{ background:#f6f8fb; color:#94a3b8; cursor:not-allowed; }
+
+    .kpis{ display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin-bottom:12px; }
+    .kpi{ padding:12px; display:flex; gap:10px; align-items:center; min-height:68px; }
+    .kpi .kIcon{
+      width:34px;height:34px;border-radius:12px;
+      background:#e8f2fb;
+      border:1px solid rgba(11,79,123,0.10);
+      display:grid;place-items:center;
+      color:#0b4f7b;
+      font-weight:900;
+      font-size:14px;
+    }
+    .kpi .kVal{font-size:18px; font-weight:900; line-height:1.1;}
+    .kpi .kLbl{font-size:11px; color:var(--muted); font-weight:800; margin-top:2px;}
+    .stars{color:#f5b301; letter-spacing:1px; font-size:11px; margin-top:3px;}
+
+    .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    .card{ padding:12px; min-height:320px; display:flex; flex-direction:column; gap:8px; }
+    .cardHeader{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .cardTitle{font-weight:900; color:#0b3351; font-size:13px;}
+    .subtle{font-size:11px; color:var(--muted); font-weight:800;}
+    .chartWrap{flex:1; padding:4px 2px 2px;}
+    canvas{width:100% !important; height:240px !important;}
+    .hint{font-size:11px; color:var(--muted); font-weight:800; margin-top:4px;}
+
+    /* Custom Legend Grid for Score Distribution */
+    .statGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .statBox {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+    }
+    .statBox .sbLeft { display: flex; align-items: center; gap: 8px; }
+    .statBox .dot { width: 10px; height: 10px; border-radius: 50%; display: block; }
+    .statBox .sbLabel { font-size: 11px; font-weight: 700; color: #475569; }
+    .statBox .sbVal { font-size: 13px; font-weight: 900; color: #0f172a; }
+
+    /* Manager */
+    .pageTitle{ font-weight:900; color:#0b3351; font-size:13px; margin:2px 0 10px; }
+    .kpisSmall{ display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom:10px; }
+    .kpiSmall{ padding:12px; display:flex; gap:10px; align-items:center; min-height:58px; }
+    .kpiSmall .kIcon{
+      width:34px;height:34px;border-radius:12px;
+      background:#e8f2fb;
+      border:1px solid rgba(11,79,123,0.10);
+      display:grid;place-items:center;
+      color:#0b4f7b;
+      font-weight:900;
+      font-size:14px;
+    }
+    .kpiSmall .kVal{font-size:16px; font-weight:900;}
+    .kpiSmall .kLbl{font-size:11px; color:var(--muted); font-weight:800; margin-top:2px;}
+
+    .toolbar{ display:flex; gap:10px; align-items:center; margin-bottom:10px; }
+    .searchWrap{
+      flex:1;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 10px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+    }
+    .searchWrap span{opacity:.6}
+    .searchWrap input{
+      border:0; outline:0;
+      width:100%;
+      font-size:12px;
+      font-weight:700;
+      color:#0f172a;
+      background:transparent;
+    }
+    .filterWrap{
+      min-width:180px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      justify-content:flex-end;
+      padding:10px 10px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+    }
+    .filterWrap .lbl{font-size:11px; font-weight:900; color:var(--muted);}
+    .filterWrap select{padding:6px 8px; border-radius:10px; font-size:12px;}
+
+    .regionSection{ margin-top:10px; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:#fff; }
+    .regionHeader{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 12px; background:#f7fafc; border-bottom:1px solid var(--line);
+      font-weight:900; color:#0b3351; font-size:12px;
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:6px;
+      background:var(--pill); border:1px solid var(--pillBorder); color:var(--pillText);
+      padding:4px 8px; border-radius:999px; font-weight:900; font-size:11px;
+    }
+    .managerCard{
+      padding:10px 12px; border-top:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .managerLeft{ display:flex; align-items:center; gap:10px; min-width:0; flex:1; }
+    .avatarCircle{
+      width:30px;height:30px;border-radius:999px;
+      background:#0a4c73; color:#fff; display:grid;place-items:center;
+      font-weight:900; font-size:11px; flex:0 0 auto;
+    }
+    .mMeta{ min-width:0; display:flex; flex-direction:column; gap:2px; }
+    .mNameRow{ display:flex; align-items:center; gap:10px; min-width:0; }
+    .mName{ font-weight:900; font-size:12px; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .mSub{ font-size:11px; font-weight:800; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .mRight{ display:flex; align-items:center; gap:10px; flex:0 0 auto; }
+    .linkBtn{ border:0; background:transparent; color:#0b4f7b; font-weight:900; font-size:11px; cursor:pointer; }
+    .caret{ font-size:12px; color:#0b4f7b; opacity:.9; }
+
+    .chauffeursWrap{ display:none; border-top:1px solid var(--line); background:#fbfdff; }
+    .tableHead{
+      display:grid; grid-template-columns: 1.2fr 1fr 1fr .8fr .7fr .7fr;
+      gap:8px; padding:8px 12px; background:#e9f1f8; color:#0b3351;
+      font-weight:900; font-size:10px; text-transform:uppercase;
+    }
+    .row{
+      display:grid; grid-template-columns: 1.2fr 1fr 1fr .8fr .7fr .7fr;
+      gap:8px; padding:10px 12px; border-top:1px solid rgba(230,237,246,0.9);
+      font-size:11px; font-weight:800; color:#1f2937; align-items:center;
+    }
+    .badge{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:3px 8px; border-radius:999px; font-size:10px; font-weight:900;
+      border:1px solid rgba(15,23,42,0.10); background:#fff; color:#0f172a;
+      width:max-content;
+    }
+    .badge.purple{background:#f3e8ff; border-color:#e9d5ff; color:#6b21a8;}
+    .badge.blue{background:#dbeafe; border-color:#bfdbfe; color:#1d4ed8;}
+    .badge.orange{background:#ffedd5; border-color:#fed7aa; color:#9a3412;}
+    .status{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:4px 10px; border-radius:999px; font-size:10px; font-weight:900; width:max-content;
+    }
+    .status.active{background:#dcfce7; color:#166534;}
+    .status.inactive{background:#fff1f2; color:#9f1239;}
+
+    /* GM modal additions */
+    .miniGrid3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; }
+    .miniGrid2{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    .metricCard{
+      border:1px solid #e6edf6;
+      border-radius:14px;
+      padding:12px;
+      background:#fff;
+      min-height:120px;
+    }
+    .metricTitle{ font-weight:900; color:#0b3351; margin-bottom:8px; font-size:12px; }
+    .metricValue{ font-weight:900; font-size:18px; color:#0f172a; }
+    .metricSub{ font-weight:800; font-size:11px; color:#64748b; margin-top:4px; }
+    .pill{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:4px 10px; border-radius:999px;
+      background:var(--pill); border:1px solid var(--pillBorder); color:var(--pillText);
+      font-weight:900; font-size:11px;
+    }
+
+    .chauffList{
+      border:1px solid #e6edf6;
+      border-radius:14px;
+      overflow:hidden;
+      background:#fff;
+    }
+    .chauffHead{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr .8fr;
+      gap:10px;
+      padding:10px 12px;
+      background:#e9f1f8;
+      color:#0b3351;
+      font-weight:900;
+      font-size:10px;
+      text-transform:uppercase;
+    }
+    .chauffRow{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr .8fr;
+      gap:10px;
+      padding:10px 12px;
+      border-top:1px solid rgba(230,237,246,0.9);
+      font-size:11px;
+      font-weight:800;
+      align-items:center;
+      cursor:pointer;
+    }
+    .chauffRow:hover{ background:#f8fbff; }
+    .delta{
+      font-weight:900;
+      font-size:11px;
+      margin-left:8px;
+    }
+    .delta.good{ color:var(--good); }
+    .delta.bad{ color:var(--bad); }
+
+    @media (max-width: 1180px){
+      .sidebar{display:none;}
+      .filtersGrid{grid-template-columns:1fr;}
+      .grid{grid-template-columns:1fr;}
+      .kpis{grid-template-columns: repeat(2, 1fr);}
+      .kpisSmall{grid-template-columns:1fr;}
+      .miniGrid3{grid-template-columns:1fr;}
+      .miniGrid2{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="slide">
+    <div class="slideHeader">
+      <div class="slideTitle">TALENT MARKETPLACE - COMPANY WIDE DASHBOARD</div>
+      <div class="careyWordmark" aria-label="Carey">
+        <svg viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CAREY">
+          <text x="0" y="92" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="92" fill="#0b4f7b">CAREY</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="slideMain">
+      <div class="frame">
+        <div class="app">
+          <aside class="sidebar">
+            <div class="brand">
+              <svg viewBox="0 0 520 170" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Carey International">
+                <text x="0" y="92" font-family="Georgia, serif" font-weight="700" font-size="96" fill="#ffffff">CAREY</text>
+                <text x="4" y="150" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="44"
+                      letter-spacing="12" fill="#d9eeff">INTERNATIONAL</text>
+              </svg>
+            </div>
+
+            <nav class="nav">
+              <a><span class="ico"></span>User role management</a>
+              <a><span class="ico"></span>Workflow Rules</a>
+              <a id="navManager" class="active"><span class="ico"></span>Manager</a>
+              <a id="navReports"><span class="ico"></span>Reports &amp; Analytics</a>
+              <a><span class="ico"></span>Content Management</a>
+              <a><span class="ico"></span>Monitoring</a>
+            </nav>
+          </aside>
+
+          <main class="main">
+            <header class="topbar">
+              <div class="topLeft">
+                <div class="welcome">Welcome back, Lawrence</div>
+                <div class="role">Admin</div>
+              </div>
+              <div class="topRight">
+                <button class="iconBtn" title="Notifications">🔔</button>
+                <button class="iconBtn" title="Settings">⚙️</button>
+                <div class="avatar" title="Profile"></div>
+              </div>
+            </header>
+
+            <section class="content">
+              <div id="pageManager" class="page active">
+                <div class="pageTitle">Manager Overview</div>
+
+                <div class="kpisSmall">
+                  <div class="panel kpiSmall">
+                    <div class="kIcon">👥</div>
+                    <div>
+                      <div class="kVal" id="mgrTotalManagers">—</div>
+                      <div class="kLbl">Total Managers</div>
+                    </div>
+                  </div>
+
+                  <div class="panel kpiSmall">
+                    <div class="kIcon">👤</div>
+                    <div>
+                      <div class="kVal" id="mgrTotalChauffeurs">—</div>
+                      <div class="kLbl">Total Chauffeurs</div>
+                    </div>
+                  </div>
+
+                  <div class="panel kpiSmall">
+                    <div class="kIcon">⭐</div>
+                    <div>
+                      <div class="kVal" id="mgrAvg">—</div>
+                      <div class="kLbl">Avg Chauffeurs/Manager</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="toolbar">
+                  <div class="searchWrap">
+                    <span>🔎</span>
+                    <input id="mgrSearch" placeholder="Search managers by name or email..." />
+                  </div>
+
+                  <div class="filterWrap">
+                    <span class="lbl">Filter</span>
+                    <select id="mgrRegionFilter">
+                      <option value="All">All</option>
+                      <option value="Northeast">Northeast</option>
+                      <option value="Southeast">Southeast</option>
+                      <option value="Midwest">Midwest</option>
+                      <option value="Southwest">Southwest</option>
+                      <option value="West">West</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div id="mgrList"></div>
+              </div>
+
+              <div id="pageReports" class="page">
+                <div class="backRow">
+                  <div class="backLink">← <span>Back to Analytics</span></div>
+                  <div class="actions">
+                    <button class="btn" id="exportPdfBtn">Export PDF</button>
+                    <button class="btn primary" id="exportExcelBtn">Export Excel</button>
+                  </div>
+                </div>
+
+                <div class="panel filters">
+                  <div class="filtersGrid">
+                    <div class="select">
+                      <label>Select Country</label>
+                      <select id="countrySelect"></select>
+                    </div>
+                    <div class="select">
+                      <label>Select Region</label>
+                      <select id="regionSelect"></select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="kpis">
+                  <div class="panel kpi">
+                    <div class="kIcon">👤</div>
+                    <div>
+                      <div class="kVal" id="kpiChauffeurs">—</div>
+                      <div class="kLbl">Total Chauffeurs</div>
+                    </div>
+                  </div>
+
+                  <div class="panel kpi">
+                    <div class="kIcon">🏢</div>
+                    <div>
+                      <div class="kVal" id="kpiManagers">—</div>
+                      <div class="kLbl">Managers</div>
+                    </div>
+                  </div>
+
+                  <div class="panel kpi">
+                    <div class="kIcon">⭐</div>
+                    <div>
+                      <div class="kVal" id="kpiRating">—</div>
+                      <div class="kLbl">Average Rating</div>
+                      <div class="stars" aria-label="rating">★★★★★</div>
+                    </div>
+                  </div>
+
+                  <div class="panel kpi">
+                    <div class="kIcon">📈</div>
+                    <div>
+                      <div class="kVal" id="kpiScore">—</div>
+                      <div class="kLbl">Average Score</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid">
+                  <div class="panel card">
+                    <div class="cardHeader">
+                      <div class="cardTitle">Performance Trend</div>
+                      <div class="subtle" id="trendScope">Scope: —</div>
+                    </div>
+                    <div class="chartWrap">
+                      <canvas id="trendChart"></canvas>
+                    </div>
+                  </div>
+
+                  <div class="panel card">
+                    <div class="cardHeader">
+                      <div class="cardTitle">Talent Tier Distribution</div>
+                      <div class="subtle" id="tierScope">Scope: —</div>
+                    </div>
+                    <div class="chartWrap">
+                      <canvas id="tierChart"></canvas>
+                    </div>
+                  </div>
+
+                  <div class="panel card" style="display:flex; flex-direction:column;">
+                    <div class="cardHeader">
+                      <div class="cardTitle">Performance Score Distribution</div>
+                      <div class="subtle">Chauffeurs by score band</div>
+                    </div>
+                    <div class="chartWrap">
+                      <canvas id="distChart"></canvas>
+                    </div>
+                    <div class="statGrid" id="distLegend">
+                      </div>
+                  </div>
+
+                  <div class="panel card">
+                    <div class="cardHeader">
+                      <div class="cardTitle">City Performance Comparison</div>
+                      <div class="subtle">Avg Score + Revenue • Click a city bar to drill in</div>
+                    </div>
+                    <div class="chartWrap">
+                      <canvas id="cityChart"></canvas>
+                    </div>
+                    <div class="hint">Each city has two bars: Avg Score (0–100) and Revenue ($). Click a city to drill-in.</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <div class="slideFooter"></div>
+  </div>
+
+  <div class="modalOverlay" id="modalOverlay" role="dialog" aria-modal="true" style="
+    position:fixed; inset:0; background:rgba(15,23,42,0.55); display:none; align-items:center; justify-content:center; padding:18px; z-index:60;">
+    <div class="modal" style="
+      width:min(1180px, 96vw); background:#fff; border-radius:18px;
+      border:1px solid rgba(255,255,255,0.20); box-shadow:0 24px 70px rgba(0,0,0,0.28); overflow:hidden;">
+      <div class="modalTop" style="
+        background:linear-gradient(180deg, #eaf4fb, #ffffff);
+        padding:14px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #e6edf6;">
+        <h3 id="modalTitle" style="margin:0; font-size:14px; letter-spacing:0.2px; color:#0b3351;">City Performance</h3>
+        <button id="closeModal" style="
+          border:1px solid rgba(15,23,42,0.12); background:#fff; padding:8px 10px; border-radius:12px; font-weight:800; cursor:pointer;">
+          Close
+        </button>
+      </div>
+
+      <div style="padding:14px 16px 10px;">
+        <div class="miniGrid3">
+          <div class="metricCard">
+            <div class="metricTitle">City Revenue (MTD)</div>
+            <div class="metricValue" id="cityRevenue">—</div>
+            <div class="metricSub">Includes corporate + personal bookings</div>
+          </div>
+          <div class="metricCard">
+            <div class="metricTitle">Avg Score</div>
+            <div class="metricValue" id="cityAvgScore">—</div>
+            <div class="metricSub">0–100 scale</div>
+          </div>
+          <div class="metricCard">
+            <div class="metricTitle">Managers</div>
+            <div class="metricValue" id="cityManagers">—</div>
+            <div class="metricSub">Active GM count for the city</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modalBody" style="padding:10px 16px 18px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+        <div style="border:1px solid #e6edf6; border-radius:14px; padding:12px; background:#fff;">
+          <div style="font-weight:900; color:#0b3351; margin-bottom:8px;">City Performance Trend</div>
+          <canvas id="cityTrendChart" style="width:100% !important; height:240px !important;"></canvas>
+        </div>
+        <div style="border:1px solid #e6edf6; border-radius:14px; padding:12px; background:#fff;">
+          <div style="font-weight:900; color:#0b3351; margin-bottom:8px;">City Score Distribution</div>
+          <canvas id="cityDistChart" style="width:100% !important; height:240px !important;"></canvas>
+        </div>
+        <div style="border:1px solid #e6edf6; border-radius:14px; padding:12px; background:#fff;">
+          <div style="font-weight:900; color:#0b3351; margin-bottom:8px;">GM Performance Comparison</div>
+          <canvas id="gmChart" style="width:100% !important; height:240px !important;"></canvas>
+          <div style="margin-top:6px; font-size:11px; color:#64748b; font-weight:800;">Click a GM bar to see revenue + reviews + chauffeurs.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modalOverlay" id="gmModalOverlay" role="dialog" aria-modal="true" style="
+    position:fixed; inset:0; background:rgba(15,23,42,0.55); display:none; align-items:center; justify-content:center; padding:18px; z-index:70;">
+    <div style="
+      width:min(1220px, 96vw); background:#fff; border-radius:18px;
+      border:1px solid rgba(255,255,255,0.20); box-shadow:0 24px 70px rgba(0,0,0,0.28); overflow:hidden;">
+      <div style="
+        background:linear-gradient(180deg, #eaf4fb, #ffffff);
+        padding:14px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #e6edf6;">
+        <h3 id="gmModalTitle" style="margin:0; font-size:14px; letter-spacing:0.2px; color:#0b3351;">GM Details</h3>
+        <button id="closeGmModal" style="
+          border:1px solid rgba(15,23,42,0.12); background:#fff; padding:8px 10px; border-radius:12px; font-weight:800; cursor:pointer;">
+          Close
+        </button>
+      </div>
+
+      <div style="padding:14px 16px 18px;">
+        <div class="miniGrid3" style="margin-bottom:12px;">
+          <div class="metricCard">
+            <div class="metricTitle">Revenue Produced (MTD)</div>
+            <div class="metricValue" id="gmRevenue">—</div>
+            <div class="metricSub">Attributed to service center</div>
+          </div>
+          <div class="metricCard">
+            <div class="metricTitle">Market Difficulty</div>
+            <div class="metricValue" id="gmMarketDifficulty">—</div>
+            <div class="metricSub">Higher = harder market (0-100)</div>
+          </div>
+          <div class="metricCard">
+            <div class="metricTitle">Customer Reviews</div>
+            <div class="metricValue" id="gmReviewScore">—</div>
+            <div class="metricSub" id="gmReviewSnippet">—</div>
+          </div>
+        </div>
+
+        <div class="miniGrid2">
+          <div class="panel" style="padding:12px; border-radius:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px;">
+              <div style="font-weight:900; color:#0b3351;">Chauffeurs (Top 10)</div>
+              <span class="pill" id="gmChauffeurCount">— chauffeurs</span>
+            </div>
+
+            <div class="chauffList" id="gmChauffeurList">
+              <div class="chauffHead">
+                <div>Chauffeur</div>
+                <div>Avg Score</div>
+                <div>Trend</div>
+              </div>
+              </div>
+
+            <div style="margin-top:8px; font-size:11px; color:#64748b; font-weight:800;">
+              Click a chauffeur to see reviews, learning & development, and market difficulty.
+            </div>
+          </div>
+
+          <div class="panel card" style="min-height:320px;">
+            <div class="cardHeader">
+              <div class="cardTitle">Revenue vs Performance Trend (6 Months)</div>
+              <div class="subtle">Monthly Revenue ($) vs Score (0-100)</div>
+            </div>
+            <div class="chartWrap">
+              <canvas id="gmRevenueTrendChart"></canvas>
+            </div>
+            <div class="hint">Left Axis: Score • Right Axis: Revenue ($)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modalOverlay" id="chModalOverlay" role="dialog" aria-modal="true" style="
+    position:fixed; inset:0; background:rgba(15,23,42,0.55); display:none; align-items:center; justify-content:center; padding:18px; z-index:80;">
+    <div style="
+      width:min(980px, 96vw); background:#fff; border-radius:18px;
+      border:1px solid rgba(255,255,255,0.20); box-shadow:0 24px 70px rgba(0,0,0,0.28); overflow:hidden;">
+      <div style="
+        background:linear-gradient(180deg, #eaf4fb, #ffffff);
+        padding:14px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #e6edf6;">
+        <h3 id="chModalTitle" style="margin:0; font-size:14px; letter-spacing:0.2px; color:#0b3351;">Chauffeur Details</h3>
+        <button id="closeChModal" style="
+          border:1px solid rgba(15,23,42,0.12); background:#fff; padding:8px 10px; border-radius:12px; font-weight:800; cursor:pointer;">
+          Close
+        </button>
+      </div>
+
+      <div style="padding:14px 16px 18px;">
+        <div class="miniGrid3" style="margin-bottom:12px;">
+          <div class="metricCard">
+            <div class="metricTitle">Customer Reviews</div>
+            <div class="metricValue" id="chReviewScore">—</div>
+            <div class="metricSub" id="chReviewSnippet">—</div>
+          </div>
+          <div class="metricCard">
+            <div class="metricTitle">Learning & Development</div>
+            <div class="metricValue" id="chLearning">—</div>
+            <div class="metricSub">Training completion & coaching</div>
+          </div>
+          <div class="metricCard">
+            <div class="metricTitle">Market Difficulty</div>
+            <div class="metricValue" id="chMarketDifficulty">—</div>
+            <div class="metricSub">Route complexity, traffic, event volume</div>
+          </div>
+        </div>
+
+        <div class="panel" style="padding:12px; border-radius:12px;">
+          <div style="font-weight:900; color:#0b3351; margin-bottom:8px;">Recent Review Highlights</div>
+          <div id="chReviewsList" style="display:flex; flex-direction:column; gap:8px; font-size:11px; font-weight:800; color:#334155;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /********************************************************
+     * Utilities
+     ********************************************************/
+    function hashStr(s){
+      let h=0;
+      for (let i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i)) >>> 0;
+      return h;
+    }
+    function clamp(n, lo, hi){ return Math.max(lo, Math.min(hi, n)); }
+    function avg(nums){
+      const s = nums.reduce((a,b)=>a+b,0);
+      return s / Math.max(1, nums.length);
+    }
+    function destroyIf(chart){ if (chart) chart.destroy(); }
+
+    function barColors(labels){
+      return labels.map((_, i) => {
+        const hue = (i * 47) % 360;
+        return `hsl(${hue} 70% 45%)`;
+      });
+    }
+
+    function formatMoney(n){
+      const abs = Math.abs(n);
+      if (abs >= 1_000_000) return "$" + (n/1_000_000).toFixed(2) + "M";
+      if (abs >= 1_000) return "$" + (n/1_000).toFixed(1) + "K";
+      return "$" + n.toFixed(0);
+    }
+
+    /********************************************************
+     * Page switching
+     ********************************************************/
+    const navManager = document.getElementById("navManager");
+    const navReports = document.getElementById("navReports");
+    const pageManager = document.getElementById("pageManager");
+    const pageReports = document.getElementById("pageReports");
+
+    function setActivePage(which){
+      const isManager = which === "manager";
+      pageManager.classList.toggle("active", isManager);
+      pageReports.classList.toggle("active", !isManager);
+      navManager.classList.toggle("active", isManager);
+      navReports.classList.toggle("active", !isManager);
+      if (!isManager) refreshAllReports();
+    }
+    navManager.addEventListener("click", ()=> setActivePage("manager"));
+    navReports.addEventListener("click", ()=> setActivePage("reports"));
+
+    /********************************************************
+     * MANAGER OVERVIEW DATA
+     ********************************************************/
+    const MANAGER_DATA = [
+      {
+        region:"Northeast",
+        managers:[
+          { id:"RJ", name:"Robert Johnson", email:"robert.johnson@company.com", phone:"+1 (555) 100-1001",
+            chauffeurs:[
+              {name:"James Peterson", email:"james.peterson@company.com", phone:"+1 (555) 200-3001", vehicle:"Luxury Sedan", tier:"Super Talent", score:98, status:"Active"},
+              {name:"Maria Garcia",   email:"maria.garcia@company.com",   phone:"+1 (555) 200-3002", vehicle:"Executive SUV", tier:"Super Talent", score:98, status:"Active"},
+              {name:"Robert Chen",    email:"robert.chen@company.com",    phone:"+1 (555) 200-3003", vehicle:"Luxury Sedan", tier:"Mega Talent",  score:95, status:"Active"},
+            ]
+          },
+          { id:"SW", name:"Sarah Williams", email:"sarah.williams@company.com", phone:"+1 (555) 100-1002",
+            chauffeurs:[
+              {name:"Daniel Kim", email:"daniel.kim@company.com", phone:"+1 (555) 200-3101", vehicle:"Luxury Sedan", tier:"Mega Talent", score:92, status:"Active"},
+              {name:"Ava Patel",  email:"ava.patel@company.com",  phone:"+1 (555) 200-3102", vehicle:"Executive SUV", tier:"Rising Talent", score:85, status:"Active"},
+              {name:"Noah Lee",   email:"noah.lee@company.com",   phone:"+1 (555) 200-3103", vehicle:"Luxury Sedan", tier:"Rising Talent", score:81, status:"Inactive"},
+            ]
+          }
+        ]
+      },
+      {
+        region:"Southeast",
+        managers:[
+          { id:"JM", name:"Jennifer Martinez", email:"jennifer.martinez@company.com", phone:"+1 (555) 100-1004",
+            chauffeurs:[
+              {name:"Isabella Moore", email:"isabella.moore@company.com", phone:"+1 (555) 200-3401", vehicle:"Luxury Sedan", tier:"Mega Talent", score:91, status:"Active"},
+              {name:"Lucas Turner",   email:"lucas.turner@company.com",   phone:"+1 (555) 200-3402", vehicle:"Executive SUV", tier:"Rising Talent", score:84, status:"Active"},
+              {name:"Mia Nelson",     email:"mia.nelson@company.com",     phone:"+1 (555) 200-3403", vehicle:"Luxury Sedan", tier:"Rising Talent", score:79, status:"Inactive"},
+            ]
+          },
+          { id:"KW", name:"Kevin White", email:"kevin.white@company.com", phone:"+1 (555) 100-1007",
+            chauffeurs:[
+              {name:"Grace Hill", email:"grace.hill@company.com", phone:"+1 (555) 200-3501", vehicle:"Executive SUV", tier:"Mega Talent", score:90, status:"Active"},
+              {name:"Leo Brooks", email:"leo.brooks@company.com", phone:"+1 (555) 200-3502", vehicle:"Luxury Sedan", tier:"Rising Talent", score:82, status:"Active"},
+            ]
+          }
+        ]
+      },
+      {
+        region:"Midwest",
+        managers:[
+          { id:"DA", name:"David Anderson", email:"david.anderson@company.com", phone:"+1 (555) 100-1005",
+            chauffeurs:[
+              {name:"Zoe Price",   email:"zoe.price@company.com",   phone:"+1 (555) 200-3601", vehicle:"Luxury Sedan", tier:"Mega Talent", score:89, status:"Active"},
+              {name:"Nathan Ward", email:"nathan.ward@company.com", phone:"+1 (555) 200-3602", vehicle:"Executive SUV", tier:"Rising Talent", score:81, status:"Active"},
+              {name:"Lily Cox",    email:"lily.cox@company.com",    phone:"+1 (555) 200-3603", vehicle:"Premium Van",  tier:"Rising Talent", score:74, status:"Inactive"},
+            ]
+          }
+        ]
+      },
+      {
+        region:"Southwest",
+        managers:[
+          { id:"BT", name:"Brandon Taylor", email:"brandon.taylor@company.com", phone:"+1 (555) 100-1011",
+            chauffeurs:[
+              {name:"Riley Moore", email:"riley.moore@company.com", phone:"+1 (555) 200-3701", vehicle:"Executive SUV", tier:"Mega Talent", score:90, status:"Active"},
+              {name:"Logan Cruz",  email:"logan.cruz@company.com",  phone:"+1 (555) 200-3702", vehicle:"Luxury Sedan", tier:"Rising Talent", score:82, status:"Active"},
+            ]
+          }
+        ]
+      },
+      {
+        region:"West",
+        managers:[
+          { id:"MC", name:"Michael Chen", email:"michael.chen@company.com", phone:"+1 (555) 100-1003",
+            chauffeurs:[
+              {name:"Ethan Clark", email:"ethan.clark@company.com", phone:"+1 (555) 200-3201", vehicle:"Executive SUV", tier:"Super Talent", score:97, status:"Active"},
+              {name:"Olivia Scott",email:"olivia.scott@company.com",phone:"+1 (555) 200-3202", vehicle:"Luxury Sedan", tier:"Mega Talent",  score:93, status:"Active"},
+              {name:"Liam Reed",   email:"liam.reed@company.com",   phone:"+1 (555) 200-3203", vehicle:"Premium Van",  tier:"Rising Talent",score:84, status:"Active"},
+            ]
+          },
+          { id:"LT", name:"Lisa Thompson", email:"lisa.thompson@company.com", phone:"+1 (555) 100-1006",
+            chauffeurs:[
+              {name:"Henry Adams", email:"henry.adams@company.com", phone:"+1 (555) 200-3301", vehicle:"Luxury Sedan", tier:"Mega Talent", score:92, status:"Active"},
+              {name:"Chloe Diaz",  email:"chloe.diaz@company.com",  phone:"+1 (555) 200-3302", vehicle:"Executive SUV", tier:"Rising Talent", score:83, status:"Active"},
+            ]
+          },
+          { id:"DP", name:"Dave Perry", email:"dave.perry@company.com", phone:"+1 (555) 100-1012",
+            chauffeurs:[
+              {name:"Emma Young",  email:"emma.young@company.com",  phone:"+1 (555) 200-3901", vehicle:"Luxury Sedan", tier:"Rising Talent", score:79, status:"Inactive"},
+              {name:"Mason Hall",  email:"mason.hall@company.com",  phone:"+1 (555) 200-3902", vehicle:"Executive SUV", tier:"Mega Talent",  score:91, status:"Active"},
+            ]
+          },
+          { id:"LG", name:"Luis Grande", email:"luis.grande@company.com", phone:"+1 (555) 100-1013",
+            chauffeurs:[
+              {name:"Sophia King", email:"sophia.king@company.com", phone:"+1 (555) 200-3903", vehicle:"Luxury Sedan", tier:"Mega Talent",  score:90, status:"Active"},
+              {name:"Aiden Cook",  email:"aiden.cook@company.com",  phone:"+1 (555) 200-3904", vehicle:"Premium Van",  tier:"Rising Talent", score:76, status:"Active"},
+            ]
+          }
+        ]
+      }
+    ];
+
+    const mgrListEl = document.getElementById("mgrList");
+    const mgrSearch = document.getElementById("mgrSearch");
+    const mgrRegionFilter = document.getElementById("mgrRegionFilter");
+
+    function tierBadge(tier){
+      if (tier === "Super Talent") return "badge purple";
+      if (tier === "Mega Talent")  return "badge blue";
+      return "badge orange";
+    }
+
+    function computeManagerKpis(){
+      const allManagers = MANAGER_DATA.flatMap(r => r.managers);
+      const totalManagers = allManagers.length;
+      const totalChauffeurs = allManagers.reduce((s,m)=> s + m.chauffeurs.length, 0);
+      const avgPer = totalManagers ? (totalChauffeurs/totalManagers) : 0;
+      document.getElementById("mgrTotalManagers").textContent = totalManagers;
+      document.getElementById("mgrTotalChauffeurs").textContent = totalChauffeurs;
+      document.getElementById("mgrAvg").textContent = avgPer.toFixed(1);
+    }
+
+    function renderManagers(){
+      const q = (mgrSearch.value || "").trim().toLowerCase();
+      const region = mgrRegionFilter.value;
+
+      mgrListEl.innerHTML = "";
+      const regionsToShow = MANAGER_DATA.filter(rs => region === "All" ? true : rs.region === region);
+
+      for (const rs of regionsToShow){
+        const filteredManagers = rs.managers.filter(m => {
+          if (!q) return true;
+          return (m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q));
+        });
+        if (!filteredManagers.length) continue;
+
+        const section = document.createElement("div");
+        section.className = "regionSection";
+
+        const header = document.createElement("div");
+        header.className = "regionHeader";
+        header.innerHTML = `
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="width:10px; height:10px; border-radius:999px; background:#0b4f7b; opacity:.75;"></span>
+            <span>${rs.region}</span>
+            <span class="chip">${filteredManagers.length} Managers</span>
+          </div>
+          <div style="opacity:.55; font-weight:900;"> </div>
+        `;
+        section.appendChild(header);
+
+        filteredManagers.forEach((m) => {
+          const card = document.createElement("div");
+          card.className = "managerCard";
+          card.innerHTML = `
+            <div class="managerLeft">
+              <div class="avatarCircle">${m.id}</div>
+              <div class="mMeta">
+                <div class="mNameRow">
+                  <div class="mName">${m.name}</div>
+                  <div class="chip">${m.chauffeurs.length} Chauffeurs</div>
+                </div>
+                <div class="mSub">${m.email} &nbsp; • &nbsp; ${m.phone}</div>
+              </div>
+            </div>
+            <div class="mRight">
+              <button class="linkBtn" data-action="toggle">Show Chauffeurs</button>
+              <span class="caret">▾</span>
+            </div>
+          `;
+
+          const wrap = document.createElement("div");
+          wrap.className = "chauffeursWrap";
+          wrap.innerHTML = `
+            <div class="tableHead">
+              <div>Chauffeur</div><div>Contact</div><div>Vehicle Type</div><div>Tier</div><div>Score</div><div>Status</div>
+            </div>
+            ${m.chauffeurs.map(ch => `
+              <div class="row">
+                <div>
+                  <div style="font-weight:900; color:#0f172a; font-size:11px;">${ch.name}</div>
+                  <div style="color:#64748b; font-weight:800; font-size:10px; margin-top:2px;">${ch.email}</div>
+                </div>
+                <div style="color:#475569;">${ch.phone}</div>
+                <div>${ch.vehicle}</div>
+                <div><span class="${tierBadge(ch.tier)}">${ch.tier}</span></div>
+                <div style="font-weight:900; color:#0b3351;">${ch.score}</div>
+                <div><span class="status ${ch.status.toLowerCase()==="active" ? "active":"inactive"}">${ch.status}</span></div>
+              </div>
+            `).join("")}
+          `;
+
+          const toggleBtn = card.querySelector('[data-action="toggle"]');
+          const caret = card.querySelector('.caret');
+          toggleBtn.addEventListener("click", () => {
+            const isOpen = wrap.style.display === "block";
+            wrap.style.display = isOpen ? "none" : "block";
+            toggleBtn.textContent = isOpen ? "Show Chauffeurs" : "Hide Chauffeurs";
+            caret.textContent = isOpen ? "▾" : "▴";
+          });
+
+          section.appendChild(card);
+          section.appendChild(wrap);
+        });
+
+        mgrListEl.appendChild(section);
+      }
+    }
+
+    mgrSearch.addEventListener("input", renderManagers);
+    mgrRegionFilter.addEventListener("change", renderManagers);
+    computeManagerKpis();
+    renderManagers();
+
+    /********************************************************
+     * REPORTS & ANALYTICS DATA + City/GM/Chauffeur drilldowns
+     ********************************************************/
+    const DATA = {
+      "All": { regions: { } },
+      "USA": {
+        regions: {
+          "West": ["Los Angeles", "San Francisco", "Seattle", "San Diego", "Portland", "Las Vegas"],
+          "Southwest": ["Dallas", "Houston", "Austin", "Phoenix"],
+          "Midwest": ["Chicago", "Detroit", "Minneapolis", "Cleveland"],
+          "Southeast": ["Miami", "Atlanta", "Charlotte", "Orlando"],
+          "Northeast": ["New York", "Boston", "Philadelphia", "Washington DC"]
+        }
+      },
+      "UK": {
+        regions: { "England": ["London", "Manchester", "Birmingham", "Liverpool"], "Scotland": ["Edinburgh", "Glasgow"] }
+      },
+      "UAE": { regions: { "Emirates": ["Dubai", "Abu Dhabi", "Sharjah"] } }
+    };
+
+    const ALL_MANAGER_NAMES = MANAGER_DATA.flatMap(r => r.managers.map(m => m.name));
+
+    const CITY_GMS = {
+      "Los Angeles": ["Dave Perry", "Luis Grande", "Michael Chen", "Lisa Thompson", "Sarah Williams"],
+      "San Francisco": ["Michael Chen", "Lisa Thompson", "Dave Perry"],
+      "Seattle": ["Michael Chen", "Lisa Thompson", "Luis Grande"],
+      "San Diego": ["Luis Grande", "Dave Perry"],
+      "Portland": ["Lisa Thompson", "Michael Chen"],
+      "Las Vegas": ["Dave Perry", "Luis Grande"],
+
+      "Dallas": ["Kevin White", "Brandon Taylor"],
+      "Houston": ["Brandon Taylor", "Kevin White"],
+      "Austin": ["Brandon Taylor", "Jennifer Martinez"],
+      "Phoenix": ["Brandon Taylor", "Sarah Williams"],
+
+      "Chicago": ["David Anderson", "Kevin White"],
+      "Detroit": ["David Anderson", "Robert Johnson"],
+      "Minneapolis": ["David Anderson", "Jennifer Martinez"],
+      "Cleveland": ["David Anderson", "Sarah Williams"],
+
+      "Miami": ["Jennifer Martinez", "Kevin White"],
+      "Atlanta": ["Sarah Williams", "Robert Johnson"],
+      "Charlotte": ["Jennifer Martinez", "Sarah Williams"],
+      "Orlando": ["Jennifer Martinez", "Kevin White"],
+
+      "New York": ["Robert Johnson", "Sarah Williams"],
+      "Boston": ["Robert Johnson", "Sarah Williams"],
+      "Philadelphia": ["Robert Johnson", "Sarah Williams"],
+      "Washington DC": ["Robert Johnson", "Sarah Williams"],
+
+      "London": ["Robert Johnson", "Sarah Williams", "Michael Chen"],
+      "Manchester": ["Lisa Thompson", "Kevin White"],
+      "Birmingham": ["David Anderson", "Jennifer Martinez"],
+      "Liverpool": ["Brandon Taylor", "Michael Chen"],
+
+      "Edinburgh": ["David Anderson", "Lisa Thompson"],
+      "Glasgow": ["Kevin White", "Brandon Taylor"],
+
+      "Dubai": ["Michael Chen", "Lisa Thompson", "Dave Perry"],
+      "Abu Dhabi": ["Jennifer Martinez", "Kevin White"],
+      "Sharjah": ["David Anderson", "Brandon Taylor"]
+    };
+
+    function getCityGms(city){
+      const list = CITY_GMS[city];
+      if (list && list.length) return list;
+      const seed = hashStr(city);
+      const a = ALL_MANAGER_NAMES[seed % ALL_MANAGER_NAMES.length];
+      const b = ALL_MANAGER_NAMES[(seed + 3) % ALL_MANAGER_NAMES.length];
+      const c = ALL_MANAGER_NAMES[(seed + 7) % ALL_MANAGER_NAMES.length];
+      return Array.from(new Set([a,b,c]));
+    }
+
+    // City revenue model
+    function cityRevenue(city){
+      const seed = hashStr("REV|" + city);
+      const base = 250000 + (seed % 900000); // 250k..1.15m
+      const bump = ((seed >> 2) % 7) * 35000;
+      return base + bump;
+    }
+
+    // Chauffeur Generation (List)
+    function chauffeursForGm(city, gmName){
+      const seed = hashStr("CHLIST|" + city + "|" + gmName);
+      const firstNames = ["Alex","Chris","Jordan","Taylor","Morgan","Casey","Riley","Cameron","Drew","Parker","Avery","Reese","Skyler","Quinn","Hayden"];
+      const lastNames  = ["Smith","Johnson","Brown","Garcia","Miller","Davis","Martinez","Anderson","Clark","Lewis","Walker","Hall","Allen","Young","King"];
+
+      const list = [];
+      for (let i=0;i<10;i++){
+        const fn = firstNames[(seed + i*3) % firstNames.length];
+        const ln = lastNames[(seed + i*5) % lastNames.length];
+        const name = `${fn} ${ln}`;
+
+        const baseScore = 70 + ((seed + i*7) % 31); // 70..100
+        const deltaRaw = ((seed >> (i%5)) % 15) - 7; // range -7 to +7 (reasonable delta)
+        const score = clamp(baseScore, 55, 99);
+        // Ensure delta doesn't suggest a score > 100 or < 0 previously
+        const safeDelta = clamp(deltaRaw, -10, 10);
+
+        list.push({ name, score, delta: safeDelta });
+      }
+      return list;
+    }
+
+    // GM model
+    function gmProfile(city, gmName){
+      const seed = hashStr("GM|" + city + "|" + gmName);
+
+      const revenue = 70000 + (seed % 260000); // 70k..330k
+      // Difficulty strict clamp 0-100
+      const difficulty = clamp(30 + ((seed >> 3) % 60), 0, 100); 
+
+      // Get chauffeurs first to average their scores
+      const ch = chauffeursForGm(city, gmName);
+      const avgChScore = avg(ch.map(c => c.score));
+      
+      // Correlate GM review score to chauffeur performance roughly
+      // e.g. avg score 90 -> 4.5+
+      const baseReview = (avgChScore / 20) - 0.2; // 90/20 = 4.5
+      const noise = ((seed % 10) / 20); // 0.0 .. 0.45
+      const reviewScore = clamp(baseReview + noise, 3.0, 5.0).toFixed(1);
+
+      const reviewSnippets = [
+        "Consistent on-time pickups and calm rides.",
+        "Great communication and professional handling.",
+        "Minor delays during peak hours—needs improvement.",
+        "Excellent service recovery and proactive updates.",
+        "Strong luxury standards and attention to detail."
+      ];
+      const reviewSnippet = reviewSnippets[seed % reviewSnippets.length];
+
+      return { revenue, difficulty, reviewScore, reviewSnippet, chauffeurs: ch };
+    }
+
+    // Chauffeur Modal Drilldown
+    function chauffeurProfile(city, gmName, chName, currentScore){
+      const seed = hashStr("CH|" + city + "|" + gmName + "|" + chName);
+
+      // Derive customer review score from the performance score
+      const rawReview = (currentScore / 20); // 100->5, 80->4
+      const noise = ((seed % 10) - 5) / 20; // -0.25 to +0.25
+      const reviewScore = clamp(rawReview + noise, 2.5, 5.0).toFixed(1);
+
+      let snippetIndex = 0;
+      if(reviewScore >= 4.8) snippetIndex = 0; 
+      else if(reviewScore >= 4.5) snippetIndex = 1; 
+      else if(reviewScore >= 4.0) snippetIndex = 3; 
+      else snippetIndex = 2; 
+
+      const snippets = [
+        "Passenger praised cleanliness and smooth driving.",
+        "Excellent etiquette and punctuality.",
+        "Customer noted late arrival; follow-up coaching needed.",
+        "Strong route knowledge and proactive communication.",
+        "Great handling of luggage and airport coordination."
+      ];
+      const reviewSnippet = snippets[snippetIndex];
+
+      const learning = clamp(60 + ((seed >> 2) % 41), 0, 100); 
+      const difficulty = clamp(25 + ((seed >> 3) % 76), 0, 100);
+
+      const highlights = [
+        "“Very professional and respectful.”",
+        "“Felt safe and comfortable throughout.”",
+        "“Car was spotless; great experience.”",
+        "“Communication could improve before pickup.”",
+        "“Handled traffic well and arrived on time.”"
+      ];
+      const list = Array.from({length:4}, (_,i)=> highlights[(seed + i) % highlights.length]);
+
+      return { reviewScore, reviewSnippet, learning, difficulty, reviews:list };
+    }
+
+    function cityMetrics(city){
+      const seed = hashStr(city);
+      const chauffeurs = 60 + (seed % 180);
+      const managers   = 3 + (seed % 10);
+      const rating     = (4.1 + ((seed % 70) / 100)).toFixed(1);
+
+      const baseScore = 82 + (seed % 160)/10; // 82..98
+      const score = baseScore.toFixed(1) + "%";
+
+      const months = ["Jan","Feb","Mar","Apr","May","Jun"];
+      const avgScore = months.map((_,i)=> clamp(baseScore - 4 + (i*0.8) + ((seed % 13) * 0.02), 0, 100));
+      const chTrend  = months.map((_,i)=> Math.round(chauffeurs - 12 + (i*3) + ((seed % 9) * 0.3)));
+
+      const superTalent = Math.round(chauffeurs * (0.18 + ((seed%10)/200)));
+      const risingTalent= Math.round(chauffeurs * (0.28 + ((seed%10)/250)));
+      const megaTalent  = Math.max(0, chauffeurs - superTalent - risingTalent);
+
+      const excellent = Math.round(chauffeurs * (0.34 + ((seed%10)/250)));
+      const good      = Math.round(chauffeurs * (0.42 + ((seed%10)/300)));
+      const average   = Math.max(0, Math.round(chauffeurs*0.18) - (seed%7));
+      const needsImp  = Math.max(0, chauffeurs - excellent - good - average);
+
+      return {
+        chauffeurs, managers, rating, score,
+        months, avgScore, chTrend,
+        tiers: { megaTalent, risingTalent, superTalent },
+        bands: { excellent, good, average, needsImp }
+      };
+    }
+
+    // -------- Reports state ----------
+    const state = { country:"All", region:"All" };
+    const countrySelect = document.getElementById("countrySelect");
+    const regionSelect  = document.getElementById("regionSelect");
+
+    const kpiChauffeurs = document.getElementById("kpiChauffeurs");
+    const kpiManagers   = document.getElementById("kpiManagers");
+    const kpiRating     = document.getElementById("kpiRating");
+    const kpiScore      = document.getElementById("kpiScore");
+
+    const trendScope = document.getElementById("trendScope");
+    const tierScope  = document.getElementById("tierScope");
+
+    let trendChart, tierChart, distChart, cityChart;
+    let cityTrendChart, cityDistChart, gmChart, gmRevenueTrendChart;
+
+    // Modals
+    const modalOverlay = document.getElementById("modalOverlay");
+    const modalTitle   = document.getElementById("modalTitle");
+    const closeModal   = document.getElementById("closeModal");
+
+    const gmModalOverlay = document.getElementById("gmModalOverlay");
+    const gmModalTitle = document.getElementById("gmModalTitle");
+    const closeGmModal = document.getElementById("closeGmModal");
+
+    const chModalOverlay = document.getElementById("chModalOverlay");
+    const chModalTitle = document.getElementById("chModalTitle");
+    const closeChModal = document.getElementById("closeChModal");
+
+    function optionHTML(values, includeAll){
+      const all = includeAll ? [`<option value="All">All</option>`] : [];
+      const opts = values.map(v => `<option value="${v}">${v}</option>`);
+      return all.concat(opts).join("");
+    }
+
+    function initCountries(){
+      const countries = ["All", ...Object.keys(DATA).filter(c => c !== "All")];
+      countrySelect.innerHTML = optionHTML(countries, false);
+      countrySelect.value = state.country;
+      populateRegionsForCountry();
+    }
+
+    function populateRegionsForCountry(){
+      if (state.country === "All"){
+        regionSelect.innerHTML = `<option value="All">All</option>`;
+        regionSelect.value = "All";
+        regionSelect.disabled = true;
+        state.region = "All";
+        return;
+      }
+      const regions = Object.keys(DATA[state.country].regions || {});
+      regionSelect.innerHTML = optionHTML(regions, true);
+      regionSelect.value = "All";
+      regionSelect.disabled = false;
+      state.region = "All";
+    }
+
+    function selectionLabel(){
+      if (state.country === "All") return "All";
+      if (state.region === "All") return state.country;
+      return `${state.country} / ${state.region}`;
+    }
+
+    function getScopedCities(){
+      if (state.country === "All"){
+        const list = [];
+        for (const c of Object.keys(DATA)){
+          if (c === "All") continue;
+          const regions = DATA[c].regions || {};
+          for (const r of Object.keys(regions)) list.push(...regions[r]);
+        }
+        return list;
+      }
+      if (state.region === "All"){
+        const list = [];
+        const regions = DATA[state.country].regions || {};
+        for (const r of Object.keys(regions)) list.push(...regions[r]);
+        return list;
+      }
+      return (DATA[state.country].regions[state.region] || []);
+    }
+
+    function aggregateMetrics(){
+      const cities = getScopedCities();
+      const ms = cities.map(cityMetrics);
+
+      const chauffeurs = Math.round(avg(ms.map(m=>m.chauffeurs)));
+      const managers   = Math.round(avg(ms.map(m=>m.managers)));
+      const rating     = (avg(ms.map(m=>Number(m.rating)))).toFixed(1);
+
+      const scoreNum   = avg(ms.map(m=>Number(m.score.replace("%",""))));
+      const score      = scoreNum.toFixed(1) + "%";
+
+      const months = ms[0]?.months || ["Jan","Feb","Mar","Apr","May","Jun"];
+      const avgScore = months.map((_,i)=> avg(ms.map(m=>m.avgScore[i])));
+      const chTrend  = months.map((_,i)=> avg(ms.map(m=>m.chTrend[i])));
+
+      const tiers = {
+        megaTalent: Math.round(avg(ms.map(m=>m.tiers.megaTalent))),
+        risingTalent: Math.round(avg(ms.map(m=>m.tiers.risingTalent))),
+        superTalent: Math.round(avg(ms.map(m=>m.tiers.superTalent)))
+      };
+
+      const bands = {
+        excellent: Math.round(avg(ms.map(m=>m.bands.excellent))),
+        good: Math.round(avg(ms.map(m=>m.bands.good))),
+        average: Math.round(avg(ms.map(m=>m.bands.average))),
+        needsImp: Math.max(0, chauffeurs - (
+          Math.round(avg(ms.map(m=>m.bands.excellent))) +
+          Math.round(avg(ms.map(m=>m.bands.good))) +
+          Math.round(avg(ms.map(m=>m.bands.average)))
+        ))
+      };
+
+      return { chauffeurs, managers, rating, score, months, avgScore, chTrend, tiers, bands };
+    }
+
+    function makeTrendChart(ctx, months, avgScore, chTrend){
+      return new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: months,
+          datasets: [
+            { label: "Avg Score", data: avgScore, tension:0.35, borderWidth:2, pointRadius:3, yAxisID:"y" },
+            { label: "Chauffeurs", data: chTrend, tension:0.35, borderWidth:2, pointRadius:3, yAxisID:"y2" }
+          ]
+        },
+        options: {
+          responsive:true,
+          maintainAspectRatio:false,
+          plugins: {
+            legend: { position:"bottom", labels:{ boxWidth:10, boxHeight:10, usePointStyle:true, pointStyle:"line" } },
+            tooltip: { intersect:false, mode:"index" }
+          },
+          scales: {
+            y:  { min:0, max:100, grid:{ color:"rgba(15,23,42,0.06)" } },
+            y2: { position:"right", min:0, max:200, grid:{ drawOnChartArea:false }, ticks:{ stepSize:50 } },
+            x:  { grid:{ display:false } }
+          }
+        }
+      });
+    }
+
+    function makePieChart(ctx, tiers){
+      return new Chart(ctx, {
+        type:"pie",
+        data:{
+          labels:[`Mega Talent: ${tiers.megaTalent}`, `Rising Talent: ${tiers.risingTalent}`, `Super Talent: ${tiers.superTalent}`],
+          datasets:[{ data:[tiers.megaTalent, tiers.risingTalent, tiers.superTalent], borderWidth:1 }]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          plugins:{ legend:{ position:"right", labels:{ boxWidth:10, boxHeight:10 } } }
+        }
+      });
+    }
+
+    function makeBarChart(ctx, labels, values, title, opts = {}){
+      const colors = opts.colors || null;
+
+      // Custom plugin to draw numbers on bars (for the screenshot look)
+      const dataLabelsPlugin = {
+        id: 'dataLabelsPlugin',
+        afterDatasetsDraw(chart, args, options) {
+          const { ctx, data } = chart;
+          ctx.save();
+          ctx.font = '700 11px Inter, sans-serif'; // Reduced size slightly
+          ctx.fillStyle = '#ffffff'; 
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+
+          chart.data.datasets.forEach((dataset, i) => {
+            const meta = chart.getDatasetMeta(i);
+            meta.data.forEach((bar, index) => {
+              const value = dataset.data[index];
+              if(value > 0){
+                // Draw inside bottom
+                ctx.fillText(value, bar.x, bar.y + (bar.height) - 5);
+              }
+            });
+          });
+          ctx.restore();
+        }
+      };
+
+      return new Chart(ctx, {
+        type:"bar",
+        data:{
+          labels,
+          datasets:[{
+            label:title,
+            data:values,
+            borderWidth:1,
+            borderRadius:6,
+            backgroundColor: colors || undefined,
+            borderColor: colors || undefined,
+            barPercentage: 0.7, // Thinner bars to match screenshot
+            categoryPercentage: 0.8
+          }]
+        },
+        plugins: [dataLabelsPlugin],
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          plugins:{ 
+            legend:{ display: !!opts.showLegend },
+            tooltip: { enabled: false } // Disable tooltip since we show numbers
+          },
+          onClick: opts.onClick || undefined,
+          scales:{
+            x:{ 
+              grid:{ display:false }, 
+              ticks: { 
+                font: { size: 10, weight: 'bold' },
+                color: '#64748b',
+                // Allow multiline labels
+                callback: function(val, index) {
+                  return this.getLabelForValue(val).split(' ');
+                }
+              }
+            },
+            y:{ 
+              beginAtZero:true, 
+              max: opts.maxY ?? undefined, 
+              grid:{ color:"rgba(15,23,42,0.06)", borderDash:[4,4] }, // Dotted grid lines
+              border: { display: false } // Hide axis line
+            }
+          }
+        }
+      });
+    }
+
+    // Jagged city score series (no sorting)
+    function getCityCompareScores(cities){
+      const pattern = [40, 96, 55, 90, 62, 84, 48, 78, 58, 92];
+      const scores = cities.map((city, i) => {
+        const noise = ((hashStr(city) % 11) - 5) * 0.8;
+        return clamp(pattern[i % pattern.length] + noise, 30, 98);
+      });
+      if (scores.length >= 1) scores[0] = 40;
+      if (scores.length >= 2) scores[1] = 96;
+      return scores;
+    }
+
+    function getCityCompareRevenues(cities){
+      // convert to a normalized axis-friendly number (e.g., in $K) for charting
+      return cities.map(c => Math.round(cityRevenue(c) / 1000)); // in thousands
+    }
+
+    function getCityCompareScopeCities(){
+      if (state.country === "All"){
+        return ["Los Angeles","Seattle","New York","Chicago","Dallas","London","Dubai","Miami"];
+      }
+      if (state.region === "All"){
+        const list = [];
+        const regions = DATA[state.country].regions || {};
+        for (const r of Object.keys(regions)) list.push(...regions[r]);
+        return list.slice(0,8);
+      }
+      return (DATA[state.country].regions[state.region] || []).slice(0,8);
+    }
+
+    function makeCityCompareChart(ctx, cities){
+      const scoreVals = getCityCompareScores(cities);
+      const revValsK  = getCityCompareRevenues(cities); // $K
+      const scoreColors = barColors(cities);
+      const revColors = barColors(cities).map(c => c.replace("45%)", "35%)")); // slight variation
+
+      return new Chart(ctx, {
+        type:"bar",
+        data:{
+          labels: cities,
+          datasets:[
+            {
+              label:"Avg Score",
+              data: scoreVals,
+              yAxisID:"y",
+              borderRadius:10,
+              borderWidth:1,
+              backgroundColor: scoreColors
+            },
+            {
+              label:"Revenue ($K)",
+              data: revValsK,
+              yAxisID:"y2",
+              borderRadius:10,
+              borderWidth:1,
+              backgroundColor: revColors
+            }
+          ]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          plugins:{
+            legend:{ position:"bottom", labels:{ boxWidth:10, boxHeight:10 } },
+            tooltip:{
+              callbacks:{
+                label:(ctx)=>{
+                  if (ctx.dataset.label.includes("Revenue")) return `Revenue: ${formatMoney(ctx.raw*1000)}`;
+                  return `Avg Score: ${ctx.raw}`;
+                }
+              }
+            }
+          },
+          onClick:(evt, elements)=>{
+            if (!elements || !elements.length) return;
+            const idx = elements[0].index;
+            openCityModal(cities[idx]);
+          },
+          scales:{
+            x:{ grid:{ display:false }, ticks:{ maxRotation:55, minRotation:55 } },
+            y:{ beginAtZero:true, max:100, grid:{ color:"rgba(15,23,42,0.06)" }, title:{ display:true, text:"Avg Score (0–100)" } },
+            y2:{
+              position:"right",
+              beginAtZero:true,
+              grid:{ drawOnChartArea:false },
+              title:{ display:true, text:"Revenue" },
+              ticks:{
+                callback:(v)=> `$${v}K`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function refreshKPIs(metrics){
+      kpiChauffeurs.textContent = metrics.chauffeurs;
+      kpiManagers.textContent = metrics.managers;
+      kpiRating.textContent = metrics.rating;
+      kpiScore.textContent = metrics.score;
+    }
+
+    function refreshCharts(metrics){
+      destroyIf(trendChart);
+      destroyIf(tierChart);
+      destroyIf(distChart);
+      destroyIf(cityChart);
+
+      trendChart = makeTrendChart(document.getElementById("trendChart"), metrics.months, metrics.avgScore, metrics.chTrend);
+      tierChart  = makePieChart(document.getElementById("tierChart"), metrics.tiers);
+
+      // --- Performance Score Distribution (Matches Screenshot) ---
+      // 1. Chart colors defined
+      const distColors = ["#174e86", "#2563eb", "#94a3b8", "#cbd5e1"]; // Dark, Mid, Grey, Light
+      
+      // 2. Chart labels (Axis)
+      const distLabels = ["4.5- 5.0", "4.0- 4.4", "3.5- 3.9", "3.0- 3.4"];
+      const distValues = [metrics.bands.excellent, metrics.bands.good, metrics.bands.average, metrics.bands.needsImp];
+
+      // 3. Make Chart
+      distChart = makeBarChart(
+        document.getElementById("distChart"),
+        distLabels,
+        distValues,
+        "Number of Chauffeurs",
+        { 
+          colors: distColors,
+          maxY: Math.max(...distValues) + 15 // Add headroom for labels
+        }
+      );
+
+      // 4. Create Custom Legend Grid below chart
+      const legendContainer = document.getElementById("distLegend");
+      const legendItems = [
+        { label: "Excellent", color: "#174e86", val: distValues[0] },
+        { label: "Good", color: "#2563eb", val: distValues[1] },
+        { label: "Average", color: "#94a3b8", val: distValues[2] },
+        { label: "Needs Improvement", color: "#cbd5e1", val: distValues[3] }
+      ];
+
+      legendContainer.innerHTML = legendItems.map(item => `
+        <div class="statBox">
+          <div class="sbLeft">
+            <span class="dot" style="background:${item.color}"></span>
+            <span class="sbLabel">${item.label}</span>
+          </div>
+          <div class="sbVal">${item.val}</div>
+        </div>
+      `).join("");
+
+      // --- End Distribution Chart Logic ---
+
+      cityChart = makeCityCompareChart(document.getElementById("cityChart"), getCityCompareScopeCities());
+
+      const scopeText = selectionLabel();
+      trendScope.textContent = `Scope: ${scopeText}`;
+      tierScope.textContent  = `Scope: ${scopeText}`;
+    }
+
+    function refreshAllReports(){
+      if (!pageReports.classList.contains("active")) return;
+      const metrics = aggregateMetrics();
+      refreshKPIs(metrics);
+      refreshCharts(metrics);
+    }
+
+    // ---- City Modal open ----
+    function openCityModal(city){
+      const m = cityMetrics(city);
+      const gms = getCityGms(city);
+      const gmRevs = gms.map(gm => gmProfile(city, gm).revenue);
+
+      modalTitle.textContent = `City Performance • ${city}`;
+
+      // Header KPIs in city modal
+      document.getElementById("cityRevenue").textContent = formatMoney(cityRevenue(city));
+      document.getElementById("cityAvgScore").textContent = m.score.replace("%","");
+      document.getElementById("cityManagers").textContent = gms.length;
+
+      destroyIf(cityTrendChart);
+      destroyIf(cityDistChart);
+      destroyIf(gmChart);
+
+      cityTrendChart = makeTrendChart(document.getElementById("cityTrendChart"), m.months, m.avgScore, m.chTrend);
+
+      cityDistChart  = makeBarChart(
+        document.getElementById("cityDistChart"),
+        ["4.5-5.0","4.0-4.4","3.5-3.9","< 3.5"],
+        [m.bands.excellent, m.bands.good, m.bands.average, m.bands.needsImp],
+        "Number of Chauffeurs"
+      );
+
+      // GM chart: show GM revenue (primary) + allow click to open GM modal
+      const colors = barColors(gms);
+      gmChart = makeBarChart(
+        document.getElementById("gmChart"),
+        gms,
+        gmRevs.map(v=>Math.round(v/1000)), // in $K
+        "Revenue ($K)",
+        {
+          maxY: undefined,
+          colors,
+          rotateX:true,
+          onClick:(evt, elements)=>{
+            if (!elements || !elements.length) return;
+            const idx = elements[0].index;
+            openGmModal(city, gms[idx]);
+          }
+        }
+      );
+
+      modalOverlay.style.display = "flex";
+    }
+
+    // ---- GM Modal open ----
+    function openGmModal(city, gmName){
+      const profile = gmProfile(city, gmName);
+
+      gmModalTitle.textContent = `GM Details • ${gmName} (${city})`;
+      document.getElementById("gmRevenue").textContent = formatMoney(profile.revenue);
+      document.getElementById("gmMarketDifficulty").textContent = profile.difficulty;
+      document.getElementById("gmReviewScore").textContent = profile.reviewScore;
+      document.getElementById("gmReviewSnippet").textContent = profile.reviewSnippet;
+
+      // Chauffeur list
+      const listEl = document.getElementById("gmChauffeurList");
+      const countEl = document.getElementById("gmChauffeurCount");
+      const chauffeurs = profile.chauffeurs;
+
+      countEl.textContent = `${chauffeurs.length} chauffeurs`;
+
+      // remove old rows (keep header)
+      listEl.querySelectorAll(".chauffRow").forEach(n => n.remove());
+
+      chauffeurs.forEach((ch, idx) => {
+        const row = document.createElement("div");
+        row.className = "chauffRow";
+        const deltaClass = ch.delta >= 0 ? "good" : "bad";
+        const deltaText = ch.delta >= 0 ? `+${ch.delta}` : `${ch.delta}`;
+
+        row.innerHTML = `
+          <div style="font-weight:900; color:#0f172a;">${ch.name}</div>
+          <div style="font-weight:900; color:#0b3351;">
+            ${ch.score}
+            <span class="delta ${deltaClass}">${deltaText}</span>
+          </div>
+          <div>
+            <span class="pill">${ch.delta >= 0 ? "Improved" : "Declined"}</span>
+          </div>
+        `;
+
+        // PASS THE SCORE TO THE MODAL
+        row.addEventListener("click", ()=>{
+          openChauffeurModal(city, gmName, ch.name, ch.score);
+        });
+
+        listEl.appendChild(row);
+      });
+
+      // GM Revenue trend chart (Fixed logic: Real Revenue vs Score)
+      destroyIf(gmRevenueTrendChart);
+      gmRevenueTrendChart = makeGmRevenueTrendChart(
+        document.getElementById("gmRevenueTrendChart"), 
+        city, 
+        gmName, 
+        profile.revenue, 
+        profile.reviewScore
+      );
+
+      gmModalOverlay.style.display = "flex";
+    }
+
+    function makeGmRevenueTrendChart(ctx, city, gmName, currentRev, currentScore){
+      const seed = hashStr("GMREV|" + city + "|" + gmName);
+      const months = ["Jan","Feb","Mar","Apr","May","Jun"];
+      
+      const baseScoreVal = parseFloat(currentScore) * 20; 
+      
+      const scoreSeries = months.map((_, i) => {
+        if (i === 5) return baseScoreVal; 
+        const noise = ((seed >> i) % 7) - 3; 
+        return clamp(baseScoreVal - 2 + (i * 0.4) + noise, 60, 100);
+      });
+
+      const revSeries = months.map((_, i) => {
+        if (i === 5) return currentRev;
+        const trendFactor = 0.85 + (i * 0.03); 
+        const noise = (((seed + i) % 11) - 5) * 2000;
+        return Math.max(0, Math.round((currentRev * trendFactor) + noise));
+      });
+
+      return new Chart(ctx, {
+        type:"line",
+        data:{
+          labels: months,
+          datasets:[
+            { 
+              label:"Avg Performance Score", 
+              data: scoreSeries, 
+              borderColor: "#3b82f6", 
+              backgroundColor: "#3b82f6",
+              tension:0.3, 
+              borderWidth:2, 
+              pointRadius:3, 
+              yAxisID:"y" 
+            },
+            { 
+              label:"Monthly Revenue ($)", 
+              data: revSeries, 
+              borderColor: "#ef4444", 
+              backgroundColor: "#ef4444",
+              tension:0.3, 
+              borderWidth:2, 
+              pointRadius:3, 
+              yAxisID:"y2" 
+            }
+          ]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          plugins:{
+            legend:{ position:"bottom", labels:{ boxWidth:10, boxHeight:10, usePointStyle:true, pointStyle:"line" } },
+            tooltip:{
+              callbacks: {
+                label: function(context) {
+                  let label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  if (context.parsed.y !== null) {
+                    if (context.dataset.yAxisID === "y2") {
+                      label += formatMoney(context.parsed.y);
+                    } else {
+                      label += context.parsed.y.toFixed(1);
+                    }
+                  }
+                  return label;
+                }
+              }
+            }
+          },
+          scales:{
+            y:{ 
+              min:0, max:100, 
+              grid:{ color:"rgba(15,23,42,0.06)" },
+              title: { display: true, text: 'Score (0-100)' }
+            },
+            y2:{ 
+              position:"right", 
+              beginAtZero:true, 
+              grid:{ drawOnChartArea:false },
+              title: { display: true, text: 'Revenue ($)' },
+              ticks:{
+                callback: function(value) {
+                  return '$' + (value / 1000).toFixed(0) + 'k';
+                }
+              }
+            },
+            x:{ grid:{ display:false } }
+          }
+        }
+      });
+    }
+
+    // ---- Chauffeur Modal open ----
+    function openChauffeurModal(city, gmName, chName, currentScore){
+      const p = chauffeurProfile(city, gmName, chName, currentScore);
+
+      chModalTitle.textContent = `Chauffeur Details • ${chName} (${gmName}, ${city})`;
+      document.getElementById("chReviewScore").textContent = p.reviewScore;
+      document.getElementById("chReviewSnippet").textContent = p.reviewSnippet;
+      document.getElementById("chLearning").textContent = p.learning;
+      document.getElementById("chMarketDifficulty").textContent = p.difficulty;
+
+      const list = document.getElementById("chReviewsList");
+      list.innerHTML = p.reviews.map(x => `
+        <div style="display:flex; gap:8px; align-items:flex-start;">
+          <span style="width:8px; height:8px; border-radius:999px; background:#0b4f7b; margin-top:5px; flex:0 0 auto;"></span>
+          <span>${x}</span>
+        </div>
+      `).join("");
+
+      chModalOverlay.style.display = "flex";
+    }
+
+    // Modal close wiring
+    closeModal.addEventListener("click", ()=> modalOverlay.style.display = "none");
+    modalOverlay.addEventListener("click", (e)=> { if (e.target === modalOverlay) modalOverlay.style.display = "none"; });
+
+    closeGmModal.addEventListener("click", ()=> gmModalOverlay.style.display = "none");
+    gmModalOverlay.addEventListener("click", (e)=> { if (e.target === gmModalOverlay) gmModalOverlay.style.display = "none"; });
+
+    closeChModal.addEventListener("click", ()=> chModalOverlay.style.display = "none");
+    chModalOverlay.addEventListener("click", (e)=> { if (e.target === chModalOverlay) chModalOverlay.style.display = "none"; });
+
+    // Dropdown handlers
+    countrySelect.addEventListener("change", (e)=>{
+      state.country = e.target.value;
+      state.region = "All";
+      populateRegionsForCountry();
+      refreshAllReports();
+    });
+    regionSelect.addEventListener("change", (e)=>{
+      state.region = e.target.value;
+      refreshAllReports();
+    });
+
+    // exports (demo)
+    document.getElementById("exportPdfBtn").addEventListener("click", ()=> alert("Export PDF (demo)."));
+    document.getElementById("exportExcelBtn").addEventListener("click", ()=> alert("Export Excel (demo)."));
+
+    // init reports
+    initCountries();
+
+    // default page = Manager
+    setActivePage("manager");
+  </script>
+</body>
+</html>
