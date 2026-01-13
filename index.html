@@ -226,20 +226,10 @@
     .hint{font-size:11px; color:var(--muted); font-weight:800; margin-top:4px;}
 
     /* Custom Legend Grid for Score Distribution */
-    .statGrid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 12px;
-    }
+    .statGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
     .statBox {
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 8px 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #fff;
+      border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px;
+      display: flex; justify-content: space-between; align-items: center; background: #fff;
     }
     .statBox .sbLeft { display: flex; align-items: center; gap: 8px; }
     .statBox .dot { width: 10px; height: 10px; border-radius: 50%; display: block; }
@@ -264,34 +254,16 @@
 
     .toolbar{ display:flex; gap:10px; align-items:center; margin-bottom:10px; }
     .searchWrap{
-      flex:1;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 10px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:#fff;
+      flex:1; display:flex; align-items:center; gap:8px; padding:10px 10px;
+      border:1px solid var(--line); border-radius:12px; background:#fff;
     }
     .searchWrap span{opacity:.6}
     .searchWrap input{
-      border:0; outline:0;
-      width:100%;
-      font-size:12px;
-      font-weight:700;
-      color:#0f172a;
-      background:transparent;
+      border:0; outline:0; width:100%; font-size:12px; font-weight:700; color:#0f172a; background:transparent;
     }
     .filterWrap{
-      min-width:180px;
-      display:flex;
-      gap:8px;
-      align-items:center;
-      justify-content:flex-end;
-      padding:10px 10px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:#fff;
+      min-width:180px; display:flex; gap:8px; align-items:center; justify-content:flex-end;
+      padding:10px 10px; border:1px solid var(--line); border-radius:12px; background:#fff;
     }
     .filterWrap .lbl{font-size:11px; font-weight:900; color:var(--muted);}
     .filterWrap select{padding:6px 8px; border-radius:10px; font-size:12px;}
@@ -379,35 +351,40 @@
       background:#fff;
     }
     .chauffHead{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr .8fr;
-      gap:10px;
-      padding:10px 12px;
-      background:#e9f1f8;
-      color:#0b3351;
-      font-weight:900;
-      font-size:10px;
-      text-transform:uppercase;
+      display:grid; grid-template-columns: 1.2fr .8fr .8fr; gap:10px;
+      padding:10px 12px; background:#e9f1f8; color:#0b3351;
+      font-weight:900; font-size:10px; text-transform:uppercase;
     }
     .chauffRow{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr .8fr;
-      gap:10px;
-      padding:10px 12px;
-      border-top:1px solid rgba(230,237,246,0.9);
-      font-size:11px;
-      font-weight:800;
-      align-items:center;
-      cursor:pointer;
+      display:grid; grid-template-columns: 1.2fr .8fr .8fr; gap:10px;
+      padding:10px 12px; border-top:1px solid rgba(230,237,246,0.9);
+      font-size:11px; font-weight:800; align-items:center; cursor:pointer;
     }
     .chauffRow:hover{ background:#f8fbff; }
-    .delta{
-      font-weight:900;
-      font-size:11px;
-      margin-left:8px;
-    }
+    .delta{ font-weight:900; font-size:11px; margin-left:8px; }
     .delta.good{ color:var(--good); }
     .delta.bad{ color:var(--bad); }
+
+    /* CONTENT MANAGEMENT SPECIFIC */
+    .cm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .cm-search-bar { width: 100%; max-width: 400px; display: flex; align-items: center; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+    .cm-search-bar input { border: none; outline: none; width: 100%; font-size: 13px; color: var(--text); }
+    .cm-filters { display: flex; gap: 12px; }
+    .cm-tabs { display: flex; gap: 24px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+    .cm-tab { padding-bottom: 12px; font-weight: 700; font-size: 13px; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; }
+    .cm-tab.active { color: #0b4f7b; border-bottom-color: #0b4f7b; }
+    
+    .cm-actions-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .cm-title { font-size: 16px; font-weight: 700; color: #0f172a; }
+    .cm-add-btn { background: #0a3f66; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    
+    .cm-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+    .cm-table th { background: #dbeafe; color: #0f172a; font-size: 11px; font-weight: 700; text-align: left; padding: 12px 16px; text-transform: uppercase; }
+    .cm-table td { padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 13px; color: #334155; vertical-align: middle; }
+    .cm-table tr:last-child td { border-bottom: none; }
+    .cm-thumb { width: 60px; height: 40px; border-radius: 6px; background: #cbd5e1; object-fit: cover; }
+    .cm-action-icons { display: flex; gap: 12px; color: #64748b; font-size: 16px; cursor: pointer; }
+    .cm-action-icons .delete { color: #dc2626; }
 
     @media (max-width: 1180px){
       .sidebar{display:none;}
@@ -449,7 +426,7 @@
               <a><span class="ico"></span>Workflow Rules</a>
               <a id="navManager" class="active"><span class="ico"></span>Manager</a>
               <a id="navReports"><span class="ico"></span>Reports &amp; Analytics</a>
-              <a><span class="ico"></span>Content Management</a>
+              <a id="navContent"><span class="ico"></span>Content Management</a>
               <a><span class="ico"></span>Monitoring</a>
             </nav>
           </aside>
@@ -620,6 +597,94 @@
                     <div class="hint">Each city has two bars: Chauffeur Score (0–100) and Revenue ($). Click a city to drill-in.</div>
                   </div>
                 </div>
+              </div>
+
+              <div id="pageContent" class="page">
+                <div class="pageTitle">Content Management System</div>
+                <div class="subtle" style="margin-bottom: 20px;">Manage learning courses and experiences</div>
+
+                <div class="cm-header">
+                  <div class="cm-search-bar">
+                    <span>🔍</span>
+                    <input type="text" placeholder="Search" style="margin-left: 8px;">
+                  </div>
+                  <div class="cm-filters">
+                    <div class="filterWrap">
+                      <span>Filter</span>
+                      <span style="font-size: 10px;">▼</span>
+                    </div>
+                    <div class="filterWrap">
+                      <span>Sort By</span>
+                      <span style="font-size: 10px;">▼</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="cm-tabs">
+                  <div class="cm-tab active">Courses Module (3)</div>
+                  <div class="cm-tab">Experiences (1)</div>
+                </div>
+
+                <div class="cm-actions-row">
+                  <div class="cm-title">Manage Courses</div>
+                  <button class="cm-add-btn">
+                    <span style="font-size: 16px;">+</span> Add New Course
+                  </button>
+                </div>
+
+                <table class="cm-table">
+                  <thead>
+                    <tr>
+                      <th>Thumbnail</th>
+                      <th>Title</th>
+                      <th>Duration</th>
+                      <th>Lessons</th>
+                      <th>Views</th>
+                      <th style="text-align: right;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><img src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=100&h=60" class="cm-thumb" alt="Car"></td>
+                      <td style="font-weight: 600;">Luxury Service Excellence</td>
+                      <td>22 min</td>
+                      <td>15</td>
+                      <td>87</td>
+                      <td>
+                        <div class="cm-action-icons" style="justify-content: flex-end;">
+                          <span>✎</span>
+                          <span class="delete">🗑</span>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&h=60" class="cm-thumb" alt="Driver"></td>
+                      <td style="font-weight: 600;">Professional Chauffeur Etiquette</td>
+                      <td>8 min</td>
+                      <td>12</td>
+                      <td>12</td>
+                      <td>
+                        <div class="cm-action-icons" style="justify-content: flex-end;">
+                          <span>✎</span>
+                          <span class="delete">🗑</span>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=100&h=60" class="cm-thumb" alt="Meeting"></td>
+                      <td style="font-weight: 600;">Conflict Management</td>
+                      <td>22 min</td>
+                      <td>15</td>
+                      <td>67</td>
+                      <td>
+                        <div class="cm-action-icons" style="justify-content: flex-end;">
+                          <span>✎</span>
+                          <span class="delete">🗑</span>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </section>
           </main>
@@ -798,7 +863,6 @@
     /********************************************************
      * Custom Plugins
      ********************************************************/
-    // Define outside to avoid scope issues
     const dataLabelsPlugin = {
       id: 'dataLabelsPlugin',
       afterDatasetsDraw(chart, args, options) {
@@ -813,8 +877,6 @@
           meta.data.forEach((bar, index) => {
             const value = dataset.data[index];
             if(value > 0){
-              // Smart text color: if bar is light (index 3), use dark text
-              // Index 0,1,2 are dark/medium blue or grey => white text
               const isLightBar = (i === 0 && index === 3); 
               ctx.fillStyle = (index === 3) ? '#0f172a' : '#ffffff';
               ctx.fillText(value, bar.x, bar.y + (bar.height) - 5);
@@ -859,19 +921,36 @@
      ********************************************************/
     const navManager = document.getElementById("navManager");
     const navReports = document.getElementById("navReports");
+    const navContent = document.getElementById("navContent");
+    
     const pageManager = document.getElementById("pageManager");
     const pageReports = document.getElementById("pageReports");
+    const pageContent = document.getElementById("pageContent");
 
     function setActivePage(which){
-      const isManager = which === "manager";
-      pageManager.classList.toggle("active", isManager);
-      pageReports.classList.toggle("active", !isManager);
-      navManager.classList.toggle("active", isManager);
-      navReports.classList.toggle("active", !isManager);
-      if (!isManager) refreshAllReports();
+      pageManager.classList.remove("active");
+      pageReports.classList.remove("active");
+      pageContent.classList.remove("active");
+      navManager.classList.remove("active");
+      navReports.classList.remove("active");
+      navContent.classList.remove("active");
+
+      if (which === "manager") {
+        pageManager.classList.add("active");
+        navManager.classList.add("active");
+      } else if (which === "reports") {
+        pageReports.classList.add("active");
+        navReports.classList.add("active");
+        refreshAllReports();
+      } else if (which === "content") {
+        pageContent.classList.add("active");
+        navContent.classList.add("active");
+      }
     }
+    
     navManager.addEventListener("click", ()=> setActivePage("manager"));
     navReports.addEventListener("click", ()=> setActivePage("reports"));
+    navContent.addEventListener("click", ()=> setActivePage("content"));
 
     /********************************************************
      * MANAGER OVERVIEW DATA
@@ -1407,7 +1486,7 @@
         data: {
           labels: months,
           datasets: [
-            { label: "Chauffeur Score", data: avgScore, tension:0.35, borderWidth:2, pointRadius:3, yAxisID:"y" }
+            { label: "Chauffeur Score", data: avgScore, tension:0.35, borderWidth:2, pointRadius:3, yAxisID:"y" },
             // Removed secondary Chauffeurs trend line entirely
           ]
         },
@@ -1465,7 +1544,7 @@
           maintainAspectRatio:false,
           plugins:{ 
             legend:{ display: !!opts.showLegend },
-            tooltip: { enabled: false } 
+            tooltip: { enabled: false } // Disable tooltip since numbers are on bars
           },
           onClick: opts.onClick || undefined,
           scales:{
@@ -1474,6 +1553,7 @@
               ticks: { 
                 font: { size: 10, weight: 'bold' },
                 color: '#64748b',
+                // Multiline labels support
                 callback: function(val, index) {
                   const label = this.getLabelForValue(val);
                   return label.split(' ');
@@ -1525,6 +1605,7 @@
       const scoreVals = getCityCompareScores(cities);
       const revValsK  = getCityCompareRevenues(cities); // $K
       
+      // FIXED COLORS: City Score = Red, Revenue = Green
       const scoreColors = Array(cities.length).fill("#dc2626"); // Red
       const revColors = Array(cities.length).fill("#16a34a");   // Green
 
@@ -1603,7 +1684,7 @@
       trendChart = makeTrendChart(document.getElementById("trendChart"), metrics.months, metrics.avgScore, metrics.chTrend);
       tierChart  = makePieChart(document.getElementById("tierChart"), metrics.tiers);
 
-      // --- Performance Score Distribution ---
+      // --- Performance Score Distribution (Matches Screenshot) ---
       const distColors = ["#174e86", "#2563eb", "#94a3b8", "#cbd5e1"]; 
       const distLabels = ["4.5- 5.0", "4.0- 4.4", "3.5- 3.9", "3.0- 3.4"];
       const distValues = [metrics.bands.excellent, metrics.bands.good, metrics.bands.average, metrics.bands.needsImp];
@@ -1619,6 +1700,7 @@
         }
       );
 
+      // Custom Legend Grid
       const legendContainer = document.getElementById("distLegend");
       const legendItems = [
         { label: "Excellent", color: "#174e86", val: distValues[0] },
@@ -1659,6 +1741,7 @@
 
       modalTitle.textContent = `City Performance • ${city}`;
 
+      // Header KPIs in city modal
       document.getElementById("cityRevenue").textContent = formatMoney(cityRevenue(city));
       document.getElementById("cityAvgScore").textContent = m.score.replace("%","");
       document.getElementById("cityManagers").textContent = gms.length;
@@ -1669,6 +1752,7 @@
 
       cityTrendChart = makeTrendChart(document.getElementById("cityTrendChart"), m.months, m.avgScore, m.chTrend);
 
+      // City Modal Distribution Chart (uses updated colors/style)
       const distColors = ["#174e86", "#2563eb", "#94a3b8", "#cbd5e1"];
       const distLabels = ["4.5- 5.0", "4.0- 4.4", "3.5- 3.9", "3.0- 3.4"];
       const distValues = [m.bands.excellent, m.bands.good, m.bands.average, m.bands.needsImp];
@@ -1684,6 +1768,7 @@
         }
       );
 
+      // GM chart: show GM revenue (primary) + allow click to open GM modal
       const colors = barColors(gms);
       gmChart = makeBarChart(
         document.getElementById("gmChart"),
@@ -1706,8 +1791,7 @@
     }
 
     // ---- GM Modal open ----
-    // Remove duplicate var declaration
-    // let gmRevenueTrendChart; is already declared globally
+    // let gmRevenueTrendChart; is already declared globally (Line ~1665) to fix the crash.
 
     function openGmModal(city, gmName){
       const profile = gmProfile(city, gmName);
@@ -1718,12 +1802,14 @@
       document.getElementById("gmReviewScore").textContent = profile.reviewScore;
       document.getElementById("gmReviewSnippet").textContent = profile.reviewSnippet;
 
+      // Chauffeur list
       const listEl = document.getElementById("gmChauffeurList");
       const countEl = document.getElementById("gmChauffeurCount");
       const chauffeurs = profile.chauffeurs;
 
       countEl.textContent = `${chauffeurs.length} chauffeurs`;
 
+      // remove old rows (keep header)
       listEl.querySelectorAll(".chauffRow").forEach(n => n.remove());
 
       chauffeurs.forEach((ch, idx) => {
@@ -1743,6 +1829,7 @@
           </div>
         `;
 
+        // PASS THE SCORE TO THE MODAL
         row.addEventListener("click", ()=>{
           openChauffeurModal(city, gmName, ch.name, ch.score);
         });
@@ -1750,6 +1837,8 @@
         listEl.appendChild(row);
       });
 
+      // GM Revenue trend chart
+      // Use requestAnimationFrame to ensure modal is painted before charting
       gmModalOverlay.style.display = "flex";
       
       requestAnimationFrame(() => {
